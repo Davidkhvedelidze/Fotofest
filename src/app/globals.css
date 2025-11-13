@@ -26,12 +26,21 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
   min-height: 100vh;
-  font-family: "DM Merab Kostava", "Fira Sans", "Inter", "Helvetica Neue", Arial,
-    sans-serif;
+  /* font-family: "DM Merab Kostava", "Fira Sans", "Inter", "Helvetica Neue", Arial,
+    sans-serif; */
   font-weight: normal;
   font-style: normal;
 }
 
 html {
   scroll-behavior: smooth;
+}
+
+h1,
+h2,
+h3 {
+  font-family: "DM Merab Kostava", "Fira Sans", "Inter", "Helvetica Neue", Arial,
+    sans-serif;
+  font-weight: normal;
+  font-style: normal;
 }

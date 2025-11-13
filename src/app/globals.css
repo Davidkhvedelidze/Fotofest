@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "DM Merab Kostava";
+  src: url("/fonts/dm-merab-kostava.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --background: #f6d2ef;
   --foreground: #1a032d;
@@ -9,7 +17,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: "Manrope", var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-sans: "DM Merab Kostava", "Manrope", var(--font-geist-sans), system-ui,
+    -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 body {
@@ -17,6 +26,10 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
   min-height: 100vh;
+  font-family: "DM Merab Kostava", "Fira Sans", "Inter", "Helvetica Neue", Arial,
+    sans-serif;
+  font-weight: normal;
+  font-style: normal;
 }
 
 html {

@@ -18,10 +18,62 @@ export function RequestEventSection() {
     message: "",
   });
 
-  const handleRequestSubmit = useCallback((data: RequestEventFormData) => {
-    // For demo purposes we simply log the form data. Replace with an API call or integration.
-    console.table(data);
-  }, []);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<{
+    type: "success" | "error" | null;
+    message: string;
+  }>({ type: null, message: "" });
+
+  const handleRequestSubmit = useCallback(
+    async (data: RequestEventFormData) => {
+      setIsSubmitting(true);
+      setSubmitStatus({ type: null, message: "" });
+
+      try {
+        const response = await fetch("/api/events/request", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          setSubmitStatus({
+            type: "success",
+            message:
+              "თქვენი მოთხოვნა წარმატებით გაიგზავნა! ჩვენ მალე დაგიკავშირდებით.",
+          });
+          // Reset form
+          setFormData({
+            name: "",
+            email: "",
+            mobile: "",
+            eventType: "",
+            date: "",
+            message: "",
+          });
+        } else {
+          setSubmitStatus({
+            type: "error",
+            message:
+              result.error || "დაფიქსირდა შეცდომა. გთხოვთ სცადოთ თავიდან.",
+          });
+        }
+      } catch (error) {
+        console.error("Error submitting form:", error);
+        setSubmitStatus({
+          type: "error",
+          message: "დაფიქსირდა შეცდომა. გთხოვთ სცადოთ თავიდან.",
+        });
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    []
+  );
 
   const handleChange =
     (field: keyof RequestEventFormData) =>
@@ -113,15 +165,27 @@ export function RequestEventSection() {
               placeholder="რა გამოცდილებას ეძებ? რამდენი სტუმარია? მოგვიყევი მეტი დეტალი"
             />
           </div>
+          {submitStatus.type && (
+            <div
+              className={`md:col-span-2 rounded-2xl p-4 ${
+                submitStatus.type === "success"
+                  ? "bg-green-50 text-green-800 border border-green-200"
+                  : "bg-red-50 text-red-800 border border-red-200"
+              }`}
+            >
+              <p className="text-sm font-medium">{submitStatus.message}</p>
+            </div>
+          )}
           <div className="md:col-span-2">
             <motion.button
               type="submit"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="w-full flex justify-center items-center"
+              disabled={isSubmitting}
+              whileHover={!isSubmitting ? { scale: 1.02 } : {}}
+              whileTap={!isSubmitting ? { scale: 0.98 } : {}}
+              className="w-full flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <p className="w-full rounded-full bg-[#681155] px-8 py-4 text-base font-semibold text-white shadow-lg shadow-[#681155]/30 cursor-pointer">
-                გაგზავნა
+                {isSubmitting ? "იგზავნება..." : "გაგზავნა"}
               </p>
             </motion.button>
           </div>

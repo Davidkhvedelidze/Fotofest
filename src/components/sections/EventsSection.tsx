@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { recentEvents } from "@/app/data/data";
+import { EventShowcase } from "@/app/types/type";
 import bgImage from "../../../public/bgElements/Element2.png";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -13,9 +14,43 @@ gsap.registerPlugin(ScrollTrigger);
 export function EventsSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
+  const [events, setEvents] = useState<EventShowcase[]>([]);
   const eventListenersRef = useRef<
     Array<{ element: HTMLElement; type: string; handler: EventListener }>
   >([]);
+
+  useEffect(() => {
+    // Fetch showcase events from API
+    fetch("/api/showcase-events")
+      .then((res) => res.json())
+      .then((data) => {
+        const apiEvents = data.events || [];
+        // Combine API events with static events, sort by newest first
+        const allEvents = [...apiEvents];
+        // Sort by createdAt if available (newest first)
+        const sortedEvents = allEvents.sort(
+          (
+            a: EventShowcase & { createdAt?: string },
+            b: EventShowcase & { createdAt?: string }
+          ) => {
+            if (a.createdAt && b.createdAt) {
+              return (
+                new Date(b.createdAt).getTime() -
+                new Date(a.createdAt).getTime()
+              );
+            }
+            return 0;
+          }
+        );
+        // Show only first 6 events on homepage
+        setEvents(sortedEvents.slice(0, 6));
+      })
+      .catch((err) => {
+        console.error("Error fetching showcase events:", err);
+        // Fallback to static events (first 6)
+        setEvents([]);
+      });
+  }, []);
 
   useEffect(() => {
     if (!sectionRef.current || !cardsRef.current) return;
@@ -194,47 +229,78 @@ export function EventsSection() {
           ref={cardsRef}
           className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3"
         >
-          {recentEvents.map((event) => (
-            <article
-              key={event.name}
-              className="event-card flex flex-col overflow-hidden rounded-3xl bg-white/80 shadow-lg shadow-[#CB6CE6]/15 backdrop-blur cursor-pointer"
-            >
-              {event?.image && (
-                <div className="relative h-48 w-full overflow-hidden">
-                  <Image
-                    src={event.image}
-                    alt={event.imageAlt || event.name}
-                    fill
-                    className="event-image object-cover"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  />
-                </div>
-              )}
-              <div className="flex flex-col p-8">
-                <div className="space-y-2">
-                  <h3 className="text-2xl font-semibold text-[#1A032D]">
-                    {event.name}
-                  </h3>
-                  <p className="text-sm font-medium uppercase tracking-widest text-[#D26E9C]">
-                    {event.location}
+          {events.map((event, index) => {
+            const eventWithId = event as EventShowcase & { id?: string };
+            const handleClick = () => {
+              if (event.redirectUrl) {
+                // Check if it's an external URL or internal route
+                if (
+                  event.redirectUrl.startsWith("http://") ||
+                  event.redirectUrl.startsWith("https://")
+                ) {
+                  window.open(
+                    event.redirectUrl,
+                    "_blank",
+                    "noopener,noreferrer"
+                  );
+                } else {
+                  window.location.href = event.redirectUrl;
+                }
+              }
+            };
+            return (
+              <article
+                key={eventWithId.id || `${event.name}-${index}`}
+                onClick={handleClick}
+                className={`event-card flex flex-col overflow-hidden rounded-3xl bg-white/80 shadow-lg shadow-[#CB6CE6]/15 backdrop-blur ${
+                  event.redirectUrl ? "cursor-pointer" : ""
+                }`}
+              >
+                {event?.image && (
+                  <div className="relative h-48 w-full overflow-hidden">
+                    <Image
+                      src={event.image}
+                      alt={event.imageAlt || event.name}
+                      fill
+                      className="event-image object-cover"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
+                  </div>
+                )}
+                <div className="flex flex-col p-8">
+                  <div className="space-y-2">
+                    <h3 className="text-2xl font-semibold text-[#1A032D]">
+                      {event.name}
+                    </h3>
+                    <p className="text-sm font-medium uppercase tracking-widest text-[#D26E9C]">
+                      {event.location}
+                    </p>
+                  </div>
+                  <p className="mt-4 flex-1 text-[#681155]">
+                    {event.description}
                   </p>
+                  <div className="mt-6 flex flex-wrap gap-2">
+                    {event.tags.map((tag: string) => (
+                      <span
+                        key={tag}
+                        className="event-tag inline-flex items-center rounded-full bg-[#F6D2EF] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#681155]"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-                <p className="mt-4 flex-1 text-[#681155]">
-                  {event.description}
-                </p>
-                <div className="mt-6 flex flex-wrap gap-2">
-                  {event.tags.map((tag: string) => (
-                    <span
-                      key={tag}
-                      className="event-tag inline-flex items-center rounded-full bg-[#F6D2EF] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#681155]"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </article>
-          ))}
+              </article>
+            );
+          })}
+        </div>
+        <div className="mt-12 text-center">
+          <Link
+            href="/events"
+            className="inline-flex items-center justify-center rounded-full bg-[#681155] px-8 py-4 text-base font-semibold text-white shadow-lg shadow-[#681155]/30 hover:bg-[#FF5EC3] transition-colors"
+          >
+            იხილე მეტი ღონისძიება →
+          </Link>
         </div>
       </div>
     </section>

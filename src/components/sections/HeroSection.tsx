@@ -94,7 +94,7 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
         <div className="floating-blob absolute -left-24 top-8 h-72 w-72 rounded-full bg-[#E2A9F1]/60 blur-3xl" />
         <div className="floating-blob absolute -right-16 bottom-4 h-64 w-64 rounded-full bg-[#FF5EC3]/50 blur-3xl" />
       </div>
-      <div className="mx-auto flex max-w-6xl flex-col flex-col-reverse gap-8 px-6 py-12 md:flex-row md:gap-12 md:py-24 lg:px-10 lg:py-32">
+      <div className="mx-auto flex max-w-6xl  flex-col-reverse gap-8 px-6 py-12 md:flex-row md:gap-12 md:py-24 lg:px-10 lg:py-32">
         <motion.div
           className="space-y-6 md:flex-1"
           initial="hidden"

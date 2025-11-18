@@ -5,6 +5,7 @@ export interface EventShowcase {
   tags: string[];
   image?: string;
   imageAlt?: string;
+  redirectUrl?: string;
 }
 
 export interface NavLink {
@@ -25,6 +26,7 @@ export interface ContactSectionProps {
 }
 
 export interface RequestEventFormData {
+  id?: string;
   name: string;
   email: string;
   mobile: string;

@@ -11,7 +11,7 @@ import { AboutSection } from "@/components/sections/AboutSection";
 import { ContactSection } from "@/components/sections/ContactSection";
 import { RequestEventSection } from "@/components/sections/RequestEventSection";
 
-export default function Home() {
+export default function HomePage() {
   const api = useApi();
 
   useEffect(() => {

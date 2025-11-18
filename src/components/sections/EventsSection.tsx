@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -23,11 +24,31 @@ export function EventsSection() {
     fetch("/api/showcase-events")
       .then((res) => res.json())
       .then((data) => {
-        setEvents(data.events);
+        const apiEvents = data.events || [];
+        // Combine API events with static events, sort by newest first
+        const allEvents = [...apiEvents];
+        // Sort by createdAt if available (newest first)
+        const sortedEvents = allEvents.sort(
+          (
+            a: EventShowcase & { createdAt?: string },
+            b: EventShowcase & { createdAt?: string }
+          ) => {
+            if (a.createdAt && b.createdAt) {
+              return (
+                new Date(b.createdAt).getTime() -
+                new Date(a.createdAt).getTime()
+              );
+            }
+            return 0;
+          }
+        );
+        // Show only first 6 events on homepage
+        setEvents(sortedEvents.slice(0, 6));
       })
       .catch((err) => {
         console.error("Error fetching showcase events:", err);
-        // Keep using static events if API fails
+        // Fallback to static events (first 6)
+        setEvents([]);
       });
   }, []);
 
@@ -272,6 +293,14 @@ export function EventsSection() {
               </article>
             );
           })}
+        </div>
+        <div className="mt-12 text-center">
+          <Link
+            href="/events"
+            className="inline-flex items-center justify-center rounded-full bg-[#681155] px-8 py-4 text-base font-semibold text-white shadow-lg shadow-[#681155]/30 hover:bg-[#FF5EC3] transition-colors"
+          >
+            იხილე მეტი ღონისძიება →
+          </Link>
         </div>
       </div>
     </section>

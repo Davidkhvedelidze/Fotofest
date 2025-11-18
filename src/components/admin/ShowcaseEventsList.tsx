@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { EventShowcase } from "@/app/types/type";
+import { EditEventForm } from "./EditEventForm";
 
 interface ShowcaseEvent extends EventShowcase {
   id?: string;
@@ -12,6 +13,7 @@ export function ShowcaseEventsList() {
   const [events, setEvents] = useState<ShowcaseEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [editingEvent, setEditingEvent] = useState<ShowcaseEvent | null>(null);
 
   useEffect(() => {
     fetchEvents();
@@ -24,7 +26,15 @@ export function ShowcaseEventsList() {
 
       if (response.ok) {
         const eventsList = Array.isArray(data.events) ? data.events : [];
-        setEvents(eventsList);
+        // Sort events by createdAt (newest first)
+        const sortedEvents = eventsList.sort(
+          (a: ShowcaseEvent, b: ShowcaseEvent) => {
+            const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            return dateB - dateA; // Descending order (newest first)
+          }
+        );
+        setEvents(sortedEvents);
       } else {
         setError("Failed to load showcase events");
       }
@@ -53,6 +63,19 @@ export function ShowcaseEventsList() {
       alert("Error deleting event");
       console.error(err);
     }
+  };
+
+  const handleEdit = (event: ShowcaseEvent) => {
+    setEditingEvent(event);
+  };
+
+  const handleEditSuccess = () => {
+    setEditingEvent(null);
+    fetchEvents();
+  };
+
+  const handleEditCancel = () => {
+    setEditingEvent(null);
   };
 
   if (isLoading) {
@@ -86,7 +109,18 @@ export function ShowcaseEventsList() {
         </button>
       </div>
 
-      {events.length === 0 ? (
+      {editingEvent && editingEvent.id ? (
+        <div className="bg-white/90 rounded-3xl p-8 shadow-lg border-2 border-[#FF5EC3]">
+          <h3 className="text-2xl font-bold text-[#1A032D] mb-6">
+            Edit Event: {editingEvent.name}
+          </h3>
+          <EditEventForm
+            event={editingEvent as EventShowcase & { id: string }}
+            onSuccess={handleEditSuccess}
+            onCancel={handleEditCancel}
+          />
+        </div>
+      ) : events.length === 0 ? (
         <div className="text-center py-8">
           <p className="text-[#681155] text-lg">No showcase events yet</p>
         </div>
@@ -106,12 +140,22 @@ export function ShowcaseEventsList() {
                     {event.location}
                   </p>
                 </div>
-                <button
-                  onClick={() => event.id && handleDelete(event.id)}
-                  className="px-4 py-2 bg-red-500 text-white rounded-full text-sm font-semibold hover:bg-red-600 transition-colors"
-                >
-                  Delete
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleEdit(event)}
+                    className="px-4 py-2 bg-[#681155] text-white rounded-full text-sm font-semibold hover:bg-[#FF5EC3] transition-colors"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => event.id && handleDelete(event.id)}
+                    className="px-4 py-2 bg-red-500 text-white rounded-full text-sm font-semibold hover:bg-red-600 transition-colors"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
 
               <p className="text-[#1A032D] mb-4">{event.description}</p>

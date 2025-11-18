@@ -265,6 +265,45 @@ export async function getShowcaseEvents(): Promise<EventShowcase[]> {
   }
 }
 
+export async function updateShowcaseEvent(
+  id: string,
+  data: {
+    name: string;
+    location: string;
+    description: string;
+    tags: string[];
+    image?: string;
+    imageAlt?: string;
+    redirectUrl?: string;
+  }
+): Promise<{ id: string; data: EventShowcase; createdAt: string } | null> {
+  const filePath = path.join(DATA_DIR, "showcase-events.json");
+  try {
+    const fileContent = await fs.readFile(filePath, "utf-8");
+    const events: Array<{
+      id: string;
+      data: EventShowcase;
+      createdAt: string;
+    }> = JSON.parse(fileContent);
+
+    const eventIndex = events.findIndex((event) => event.id === id);
+    if (eventIndex === -1) {
+      return null;
+    }
+
+    // Update the event
+    events[eventIndex] = {
+      ...events[eventIndex],
+      data: data as EventShowcase,
+    };
+
+    await fs.writeFile(filePath, JSON.stringify(events, null, 2));
+    return events[eventIndex];
+  } catch {
+    return null;
+  }
+}
+
 export async function deleteShowcaseEvent(id: string): Promise<boolean> {
   const filePath = path.join(DATA_DIR, "showcase-events.json");
   try {

@@ -1,28 +1,20 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { navLinks } from "@/app/data/data";
+import { motion } from "framer-motion";
+import { useState } from "react";
 
-export interface NavLink {
-  label: string;
-  href: string;
-}
-
-interface MainNavigationProps {
-  links: NavLink[];
-}
-
-export function MainNavigation({ links }: MainNavigationProps) {
+export function MainNavigation() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 bg-[#F6D2EF]/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 bg-[#681155]/80 backdrop-blur-lg">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 lg:px-10">
-        <a href="#welcome" className="text-xl font-semibold text-[#1A032D]">
-          FotoFest
+        <a href="#welcome" className="text-xl font-semibold text-white">
+          PhotoFest
         </a>
-        <nav className="hidden gap-8 text-sm font-medium text-[#1A032D] md:flex">
-          {links.map((link) => (
+        <nav className="hidden gap-8 text-sm font-medium text-white md:flex">
+          {navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
@@ -47,19 +39,23 @@ export function MainNavigation({ links }: MainNavigationProps) {
             strokeWidth="1.5"
             className="h-5 w-5"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M4 6h16M4 12h16M4 18h16"
+            />
           </svg>
         </motion.button>
       </div>
       {isOpen ? (
         <motion.nav
           initial={{ height: 0, opacity: 0 }}
-          animate={{ height: 'auto', opacity: 1 }}
+          animate={{ height: "auto", opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
           className="md:hidden"
         >
           <ul className="space-y-4 px-6 pb-6 text-base font-semibold text-[#1A032D]">
-            {links.map((link) => (
+            {navLinks.map((link) => (
               <li key={link.href}>
                 <a
                   href={link.href}

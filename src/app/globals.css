@@ -74,6 +74,57 @@ h3 {
   mask: url("https://raw.githubusercontent.com/supahfunk/supah-codepen/master/painting-sprite-2.png");
 }
 
+/* Global Submit Button Styles */
+button[type="submit"] {
+  width: 100%;
+  padding: 0.875rem 2rem;
+  border-radius: 9999px;
+  background: #681155;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px -1px rgba(104, 17, 85, 0.3);
+  font-family: var(--font-sans);
+}
+button[type="button"] {
+  padding: 0.875rem 2rem;
+  border-radius: 9999px;
+  background: #681155;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px -1px rgba(104, 17, 85, 0.3);
+  font-family: var(--font-sans);
+}
+
+button[type="submit"]:hover:not(:disabled) {
+  background: #ff5ec3;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px -2px rgba(104, 17, 85, 0.4);
+}
+
+button[type="submit"]:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px -1px rgba(104, 17, 85, 0.3);
+}
+
+button[type="submit"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+button[type="submit"]:focus {
+  outline: 2px solid #ff5ec3;
+  outline-offset: 2px;
+}
+
 /* Ant Design Custom Styles */
 .ant-picker {
   width: 100% !important;

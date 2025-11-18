@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import gsap from "gsap";
+import { useApi } from "@/hooks/useApi";
 import { MainNavigation } from "@/components/layout/MainNavigation";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { ExperiencesSection } from "@/components/sections/ExperiencesSection";
@@ -11,6 +12,8 @@ import { ContactSection } from "@/components/sections/ContactSection";
 import { RequestEventSection } from "@/components/sections/RequestEventSection";
 
 export default function Home() {
+  const api = useApi();
+
   useEffect(() => {
     const ctx = gsap.context(() => {
       gsap.to(".floating-blob", {
@@ -24,6 +27,14 @@ export default function Home() {
     });
 
     return () => ctx.revert();
+  }, []);
+
+  // Optional: Check API health on page load
+  useEffect(() => {
+    api.checkHealth().catch((err) => {
+      console.error("API health check failed:", err);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

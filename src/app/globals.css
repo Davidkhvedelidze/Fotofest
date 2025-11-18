@@ -47,11 +47,21 @@ h3 {
 }
 
 #cover {
-  width: 368px;
-  height: 400px;
-  border: 20px solid #fff;
+  width: 100%;
+  max-width: 368px;
+  height: auto;
+  aspect-ratio: 368 / 400;
+  border: 12px solid #fff;
   overflow: hidden;
   box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.2);
+}
+
+@media (min-width: 768px) {
+  #cover {
+    width: 368px;
+    height: 400px;
+    border-width: 20px;
+  }
 }
 
 #hero-image {

@@ -91,9 +91,9 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
         <div className="floating-blob absolute -left-24 top-8 h-72 w-72 rounded-full bg-[#E2A9F1]/60 blur-3xl" />
         <div className="floating-blob absolute -right-16 bottom-4 h-64 w-64 rounded-full bg-[#FF5EC3]/50 blur-3xl" />
       </div>
-      <div className="mx-auto flex max-w-6xl gap-12 px-6 py-24  lg:px-10 lg:py-32">
+      <div className="mx-auto flex max-w-6xl flex-col flex-col-reverse gap-8 px-6 py-12 md:flex-row md:gap-12 md:py-24 lg:px-10 lg:py-32">
         <motion.div
-          className="space-y-6"
+          className="space-y-6 md:flex-1"
           initial="hidden"
           animate="visible"
           transition={{ duration: 0.8, ease: "easeOut" }}
@@ -102,11 +102,11 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
           <p className="text-sm font-semibold uppercase tracking-[0.4em] text-[#CB6CE6]">
             გაიღიმე · გადაიღე · გააზიარე
           </p>
-          <h1 className="text-4xl font-bold text-[#1A032D] md:text-6xl">
+          <h1 className="text-3xl font-bold text-[#1A032D] md:text-4xl lg:text-6xl">
             ჯადოსნური სარკე, ფოტოკაბინა და 360° გამოცდილება თქვენი
             ღონისძიებისთვის
           </h1>
-          <p className="max-w-xl text-lg text-[#681155]">
+          <p className="max-w-xl text-base text-[#681155] md:text-lg">
             PhotoFest ქმნის დაუვიწყარ მომენტებს ციფრული მაგიით. ჩვენი მოდულური
             ფოტო ზონა მოიცავს ჯადოსნურ სარკეს, ფოტოკაბინას და 360° პლატფორმას —
             ყოველ ივენთზე ვქმნით უნიკალურ დიზაინს, მყისიერ ბეჭდვას და
@@ -118,7 +118,7 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
               onClick={handleCtaClick}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="inline-flex items-center justify-center rounded-full bg-[#FF5EC3] px-8 py-3 text-base font-semibold text-white shadow-lg shadow-[#FF5EC3]/30"
+              className="inline-flex items-center justify-center rounded-full bg-[#FF5EC3] px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#FF5EC3]/30 md:px-8 md:py-3 md:text-base"
             >
               დაჯავშნე ღონისძიება
             </motion.a>
@@ -126,19 +126,19 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
               href="#events"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="inline-flex items-center justify-center rounded-full border border-[#CB6CE6] px-8 py-3 text-base font-semibold text-[#1A032D]"
+              className="inline-flex items-center justify-center rounded-full border border-[#CB6CE6] px-6 py-2.5 text-sm font-semibold text-[#1A032D] md:px-8 md:py-3 md:text-base"
             >
               იხილე გამოცდილება
             </motion.a>
           </div>
         </motion.div>
         <motion.div
-          className="relative flex items-center justify-center"
+          className="relative flex w-full items-center justify-center md:w-auto md:flex-1"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.9, ease: "easeOut", delay: 0.5 }}
         >
-          <div id="cover">
+          <div id="cover" className="w-full max-w-sm md:max-w-none">
             <img
               ref={imgRef}
               src={heroImages[currentImageIndex]}

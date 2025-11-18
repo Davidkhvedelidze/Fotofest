@@ -34,7 +34,8 @@ export const experienceFeatures: ExperienceFeature[] = [
       "ციფრული ვერსიის QR კოდი — გაზიარება ერთ შეხებაში",
     ],
     accentColor: "#CB6CE6",
-    image: photoBooth,
+    image:
+      "https://scontent.cdninstagram.com/v/t51.82787-15/556694761_17843643897584013_8764252181146379206_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=107&ig_cache_key=MzczMjI3NDM3MjU4OTc5MTk3OQ%3D%3D.3-ccb1-7&ccb=1-7&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6InhwaWRzLjE0NDB4MTc5Ny5zZHIuQzMifQ%3D%3D&_nc_ohc=XmvbsZtdfFAQ7kNvwHOzwQL&_nc_oc=AdlW18U6byDmTCyE9lpBLX64_DFs_261MQofbByDBidTPtYTCoIfGPWEKR4AoJLbm7c&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=JGCnLT_381FLz8CSnCmjzA&oh=00_Afihc_qxcf7nODLbJgQaCW8dxlgVjb6zNNzFTRnNyVcd6Q&oe=69224848",
     imageAlt: "ფოტოკაბინა",
   },
   {

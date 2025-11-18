@@ -86,7 +86,10 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
   }, []);
 
   return (
-    <section id="welcome" className="relative overflow-hidden">
+    <section
+      id="welcome"
+      className="relative overflow-hidden h-[calc(100vh-60px)]"
+    >
       <div className="absolute inset-0 -z-10">
         <div className="floating-blob absolute -left-24 top-8 h-72 w-72 rounded-full bg-[#E2A9F1]/60 blur-3xl" />
         <div className="floating-blob absolute -right-16 bottom-4 h-64 w-64 rounded-full bg-[#FF5EC3]/50 blur-3xl" />

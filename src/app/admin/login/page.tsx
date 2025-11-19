@@ -25,20 +25,19 @@ function AdminLoginForm() {
     setError("");
     setIsLoading(true);
 
-    // Simple authentication (in production, use proper auth)
-    const adminUsername =
-      process.env.NEXT_PUBLIC_ADMIN_USERNAME || "Photofest2@gmail.com";
-    const adminPassword =
-      process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "Photofest25092025";
+    const res = await fetch("/api/admin/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
 
-    if (username === adminUsername && password === adminPassword) {
-      localStorage.setItem("admin_authenticated", "true");
-      // Redirect to the specified URL or default to /admin
+    if (res.ok) {
       router.push(redirectUrl);
     } else {
       setError("Invalid username or password");
-      setIsLoading(false);
     }
+
+    setIsLoading(false);
   };
 
   return (

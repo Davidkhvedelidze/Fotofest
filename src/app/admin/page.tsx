@@ -33,8 +33,10 @@ export default function AdminDashboard() {
     }
   }, [router]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("admin_authenticated");
+  const handleLogout = async () => {
+    await fetch("/api/admin/logout", {
+      method: "POST",
+    });
     router.push("/admin/login");
   };
 
@@ -70,7 +72,6 @@ export default function AdminDashboard() {
             Logout
           </button>
         </div>
-
         {/* Stats */}
         <AdminStats />
 

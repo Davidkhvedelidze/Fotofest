@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -12,6 +13,7 @@ import bgImage from "../../../public/bgElements/Element2.png";
 gsap.registerPlugin(ScrollTrigger);
 
 export function EventsSection() {
+  const router = useRouter();
   const sectionRef = useRef<HTMLElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
   const [events, setEvents] = useState<EventShowcase[]>([]);
@@ -243,9 +245,11 @@ export function EventsSection() {
                     "_blank",
                     "noopener,noreferrer"
                   );
-                } else {
-                  window.location.href = event.redirectUrl;
+                } else if (event.redirectUrl.startsWith("/")) {
+                  // Internal route - use Next.js router for client-side navigation
+                  router.push(event.redirectUrl);
                 }
+                // If redirectUrl doesn't match expected patterns, do nothing (safety)
               }
             };
             return (

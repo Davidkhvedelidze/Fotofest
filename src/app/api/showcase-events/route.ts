@@ -5,8 +5,15 @@ import {
   validateShowcaseEvent,
 } from "@/lib/api-utils";
 import { EventShowcase } from "@/app/types/type";
+import { verifyAdminToken } from "@/lib/auth-utils";
 
 export async function POST(request: NextRequest) {
+  // Verify admin authentication
+  const isAuthenticated = await verifyAdminToken();
+  if (!isAuthenticated) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const body: EventShowcase = await request.json();
 
@@ -18,6 +25,7 @@ export async function POST(request: NextRequest) {
 
     // Save the showcase event
     const savedEvent = await saveShowcaseEvent(body);
+    console.log("Showcase event saved:", savedEvent);
 
     return NextResponse.json(
       {

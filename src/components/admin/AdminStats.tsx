@@ -46,14 +46,27 @@ export function AdminStats() {
         ? contactsData
         : [];
 
-      // Calculate recent events (last 7 days)
+      // Calculate recent events (last 7 days) based on createdAt
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-      const recentEvents = events.filter((event: RequestEventFormData) => {
-        const eventDate = new Date(event.date);
-        return eventDate >= sevenDaysAgo;
-      });
+      const recentEvents = events.filter(
+        (
+          eventRecord:
+            | { createdAt: string; data?: RequestEventFormData }
+            | RequestEventFormData
+        ) => {
+          const createdAt =
+            "createdAt" in eventRecord
+              ? eventRecord.createdAt
+              : "data" in eventRecord && eventRecord.data
+              ? (eventRecord.data as { createdAt?: string }).createdAt
+              : undefined;
+          if (!createdAt) return false;
+          const createdDate = new Date(createdAt);
+          return createdDate >= sevenDaysAgo;
+        }
+      );
 
       setStats({
         totalEvents: events.length,

@@ -18,19 +18,29 @@ export default function AdminDashboard() {
   const router = useRouter();
 
   useEffect(() => {
-    // Check if user is authenticated
-    const authStatus = localStorage.getItem("admin_authenticated");
-    if (authStatus === "true") {
-      setTimeout(() => {
-        setIsAuthenticated(true);
+    // Check authentication via JWT cookie
+    const checkAuth = async () => {
+      try {
+        const response = await fetch("/api/admin/me");
+        if (response.ok) {
+          const data = await response.json();
+          if (data.authenticated) {
+            setIsAuthenticated(true);
+          } else {
+            router.push("/admin/login");
+          }
+        } else {
+          router.push("/admin/login");
+        }
+      } catch (err) {
+        console.error("Auth check failed:", err);
+        router.push("/admin/login");
+      } finally {
         setIsLoading(false);
-      }, 100);
-    } else {
-      router.push("/admin/login");
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 100);
-    }
+      }
+    };
+
+    checkAuth();
   }, [router]);
 
   const handleLogout = async () => {

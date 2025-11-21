@@ -13,11 +13,22 @@ function AdminLoginForm() {
   const redirectUrl = searchParams.get("redirect") || "/admin";
 
   useEffect(() => {
-    // If already authenticated, redirect immediately
-    const authStatus = localStorage.getItem("admin_authenticated");
-    if (authStatus === "true") {
-      router.push(redirectUrl);
-    }
+    // Check if already authenticated via JWT cookie
+    const checkAuth = async () => {
+      try {
+        const response = await fetch("/api/admin/me");
+        if (response.ok) {
+          const data = await response.json();
+          if (data.authenticated) {
+            router.push(redirectUrl);
+          }
+        }
+      } catch {
+        // Not authenticated, stay on login page
+      }
+    };
+
+    checkAuth();
   }, [router, redirectUrl]);
 
   const handleSubmit = async (e: React.FormEvent) => {

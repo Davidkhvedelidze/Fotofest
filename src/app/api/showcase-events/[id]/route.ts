@@ -1,10 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import { deleteShowcaseEvent, updateShowcaseEvent, validateShowcaseEvent } from "@/lib/api-utils";
+import {
+  deleteShowcaseEvent,
+  updateShowcaseEvent,
+  validateShowcaseEvent,
+} from "@/lib/api-utils";
+import { verifyAdminToken } from "@/lib/auth-utils";
 
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Verify admin authentication
+  const isAuthenticated = await verifyAdminToken();
+  if (!isAuthenticated) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const { id } = await params;
     const deleted = await deleteShowcaseEvent(id);
@@ -30,23 +41,30 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Verify admin authentication
+  const isAuthenticated = await verifyAdminToken();
+  if (!isAuthenticated) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const { id } = await params;
     const body = await request.json();
-    
+
     const validation = validateShowcaseEvent(body);
     if (!validation.valid) {
-      return NextResponse.json(
-        { error: validation.error },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: validation.error }, { status: 400 });
     }
 
     const updated = await updateShowcaseEvent(id, body);
 
     if (updated) {
       return NextResponse.json(
-        { success: true, message: "Event updated successfully", event: updated },
+        {
+          success: true,
+          message: "Event updated successfully",
+          event: updated,
+        },
         { status: 200 }
       );
     } else {

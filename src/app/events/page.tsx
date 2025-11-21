@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { EventShowcase } from "@/app/types/type";
 import bgImage from "../../../public/bgElements/Element2.png";
 
 const EVENTS_PER_PAGE = 9;
 
 export default function EventsPage() {
+  const router = useRouter();
   const [events, setEvents] = useState<EventShowcase[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
@@ -64,8 +66,9 @@ export default function EventsPage() {
         event.redirectUrl.startsWith("https://")
       ) {
         window.open(event.redirectUrl, "_blank", "noopener,noreferrer");
-      } else {
-        // window?.location?.href = event.redirectUrl;
+      } else if (event.redirectUrl.startsWith("/")) {
+        // Internal route - use Next.js router for client-side navigation
+        router.push(event.redirectUrl);
       }
     }
   };

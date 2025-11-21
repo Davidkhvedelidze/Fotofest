@@ -12,14 +12,17 @@ export function AntdProvider({ children }: AntdProviderProps) {
     <ConfigProvider
       theme={{
         token: {
-          colorPrimary: "#681155",
-          colorPrimaryHover: "#FF5EC3",
-          borderRadius: 16,
+          colorPrimary: "var(--color-primary-600)",
+          colorPrimaryHover: "var(--color-primary-500)",
+          colorTextBase: "var(--color-foreground)",
+          colorBgBase: "var(--color-surface)",
+          colorBorder: "var(--color-border-strong)",
+          borderRadius: 12,
           fontFamily: "var(--font-sans)",
         },
         components: {
           DatePicker: {
-            borderRadius: 16,
+            borderRadius: 12,
             controlHeight: 48,
           },
         },

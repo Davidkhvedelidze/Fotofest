@@ -10,6 +10,7 @@ import { EventsSection } from "@/components/sections/EventsSection";
 import { AboutSection } from "@/components/sections/AboutSection";
 import { ContactSection } from "@/components/sections/ContactSection";
 import { RequestEventSection } from "@/components/sections/RequestEventSection";
+import { logError } from "@/lib/services/logger";
 
 export default function HomePage() {
   const api = useApi();
@@ -32,7 +33,7 @@ export default function HomePage() {
   // Optional: Check API health on page load
   useEffect(() => {
     api.checkHealth().catch((err) => {
-      console.error("API health check failed:", err);
+      logError({ message: "API health check failed", error: err });
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

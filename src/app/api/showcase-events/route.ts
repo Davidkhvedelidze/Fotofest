@@ -37,8 +37,13 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     console.error("Error saving showcase event:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { error: "Failed to save showcase event" },
+      {
+        error: "Failed to save showcase event",
+        details: process.env.NODE_ENV === "development" ? errorMessage : undefined,
+      },
       { status: 500 }
     );
   }

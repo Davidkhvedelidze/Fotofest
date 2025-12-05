@@ -7,6 +7,11 @@ import { EventShowcase } from "@/app/types/type";
 
 const STORAGE_KEY = "showcase-events";
 
+// Check if we're on Vercel
+function isVercel(): boolean {
+  return process.env.VERCEL === "1";
+}
+
 // Check if we're using Vercel KV
 function useKV(): boolean {
   return !!(
@@ -79,17 +84,33 @@ async function loadFromFile(): Promise<Array<{ id: string; data: EventShowcase; 
 
 // Public API
 export async function saveEvents(events: Array<{ id: string; data: EventShowcase; createdAt: string }>) {
-  if (useKV()) {
+  // On Vercel, we MUST use KV (file system is read-only)
+  if (isVercel()) {
+    if (!useKV()) {
+      throw new Error(
+        "Vercel KV is not configured. Please set up KV storage in your Vercel project:\n" +
+        "1. Go to your Vercel project → Storage → Create Database → KV\n" +
+        "2. Add the KV_REST_API_URL and KV_REST_API_TOKEN environment variables\n" +
+        "3. Redeploy your application"
+      );
+    }
     await saveToKV(events);
   } else {
+    // Local development - use file system
     await saveToFile(events);
   }
 }
 
 export async function loadEvents(): Promise<Array<{ id: string; data: EventShowcase; createdAt: string }>> {
-  if (useKV()) {
+  // On Vercel, we MUST use KV (file system is read-only)
+  if (isVercel()) {
+    if (!useKV()) {
+      console.warn("Vercel KV not configured, returning empty array");
+      return [];
+    }
     return await loadFromKV();
   } else {
+    // Local development - use file system
     return await loadFromFile();
   }
 }

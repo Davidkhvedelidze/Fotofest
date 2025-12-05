@@ -254,8 +254,6 @@ export async function saveShowcaseEvent(data: {
   redirectUrl?: string;
   date?: string;
 }): Promise<{ id: string; data: EventShowcase; createdAt: string }> {
-  await ensureDataDir();
-
   // Sanitize redirectUrl if provided
   let sanitizedRedirectUrl = data.redirectUrl;
   if (data.redirectUrl) {
@@ -274,39 +272,27 @@ export async function saveShowcaseEvent(data: {
     createdAt: new Date().toISOString(),
   };
 
-  const filePath = path.join(DATA_DIR, "showcase-events.json");
-  let events: Array<{ id: string; data: EventShowcase; createdAt: string }> =
-    [];
-
-  try {
-    const fileContent = await fs.readFile(filePath, "utf-8");
-    events = JSON.parse(fileContent);
-  } catch {
-    // File doesn't exist, start with empty array
-  }
-
+  // Use storage abstraction (supports both file system and Vercel KV)
+  const { loadEvents, saveEvents } = await import("./storage");
+  const events = await loadEvents();
   events.push(record);
-  await fs.writeFile(filePath, JSON.stringify(events, null, 2));
+  await saveEvents(events);
 
   return record;
 }
 
 export async function getShowcaseEvents(): Promise<EventShowcase[]> {
-  const filePath = path.join(DATA_DIR, "showcase-events.json");
-  try {
-    const fileContent = await fs.readFile(filePath, "utf-8");
-    const events = JSON.parse(fileContent);
-    // Return just the data part, not the full record
-    return events.map(
-      (event: { id: string; data: EventShowcase; createdAt: string }) => ({
-        ...event.data,
-        id: event.id,
-        createdAt: event.createdAt,
-      })
-    );
-  } catch {
-    return [];
-  }
+  // Use storage abstraction (supports both file system and Vercel KV)
+  const { loadEvents } = await import("./storage");
+  const events = await loadEvents();
+  // Return just the data part, not the full record
+  return events.map(
+    (event: { id: string; data: EventShowcase; createdAt: string }) => ({
+      ...event.data,
+      id: event.id,
+      createdAt: event.createdAt,
+    })
+  );
 }
 
 export async function updateShowcaseEvent(
@@ -322,49 +308,41 @@ export async function updateShowcaseEvent(
     date?: string;
   }
 ): Promise<{ id: string; data: EventShowcase; createdAt: string } | null> {
-  const filePath = path.join(DATA_DIR, "showcase-events.json");
-  try {
-    const fileContent = await fs.readFile(filePath, "utf-8");
-    const events: Array<{
-      id: string;
-      data: EventShowcase;
-      createdAt: string;
-    }> = JSON.parse(fileContent);
+  // Use storage abstraction
+  const { loadEvents, saveEvents } = await import("./storage");
+  const events = await loadEvents();
 
-    const eventIndex = events.findIndex((event) => event.id === id);
-    if (eventIndex === -1) {
-      return null;
-    }
-
-    // Sanitize redirectUrl if provided
-    let sanitizedRedirectUrl = data.redirectUrl;
-    if (data.redirectUrl) {
-      sanitizedRedirectUrl = sanitizeRedirectUrl(data.redirectUrl) || undefined;
-    }
-
-    // Update the event
-    events[eventIndex] = {
-      ...events[eventIndex],
-      data: {
-        ...data,
-        redirectUrl: sanitizedRedirectUrl,
-      } as EventShowcase,
-    };
-
-    await fs.writeFile(filePath, JSON.stringify(events, null, 2));
-    return events[eventIndex];
-  } catch {
+  const eventIndex = events.findIndex((event) => event.id === id);
+  if (eventIndex === -1) {
     return null;
   }
+
+  // Sanitize redirectUrl if provided
+  let sanitizedRedirectUrl = data.redirectUrl;
+  if (data.redirectUrl) {
+    sanitizedRedirectUrl = sanitizeRedirectUrl(data.redirectUrl) || undefined;
+  }
+
+  // Update the event
+  events[eventIndex] = {
+    ...events[eventIndex],
+    data: {
+      ...data,
+      redirectUrl: sanitizedRedirectUrl,
+    } as EventShowcase,
+  };
+
+  await saveEvents(events);
+  return events[eventIndex];
 }
 
 export async function deleteShowcaseEvent(id: string): Promise<boolean> {
-  const filePath = path.join(DATA_DIR, "showcase-events.json");
   try {
-    const fileContent = await fs.readFile(filePath, "utf-8");
-    let events = JSON.parse(fileContent);
-    events = events.filter((event: { id: string }) => event.id !== id);
-    await fs.writeFile(filePath, JSON.stringify(events, null, 2));
+    // Use storage abstraction
+    const { loadEvents, saveEvents } = await import("./storage");
+    const events = await loadEvents();
+    const filteredEvents = events.filter((event: { id: string }) => event.id !== id);
+    await saveEvents(filteredEvents);
     return true;
   } catch {
     return false;

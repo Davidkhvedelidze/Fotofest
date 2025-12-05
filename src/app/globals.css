@@ -30,6 +30,14 @@
   --gradient-background: linear-gradient(180deg, #edf1f8 0%, #f8fbff 100%);
   --font-sans: "DM Merab Kostava", "Manrope", var(--font-geist-sans), system-ui,
     -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  /* Brand colors */
+  --color-brand-purple: #681155;
+  --color-brand-purple-light: #cb6ce6;
+  --color-brand-purple-lighter: #e2a9f1;
+  --color-brand-purple-lightest: #f6d2ef;
+  --color-brand-pink: #ff5ec3;
+  --color-text-dark: #1a032d;
+  --color-eyebrow: #cb6ce6;
 }
 
 [data-theme="dark"] {
@@ -47,6 +55,14 @@
   --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.45);
   --shadow-elevated: 0 20px 60px rgba(0, 0, 0, 0.55);
   --gradient-background: linear-gradient(180deg, #0f1624 0%, #111a2c 100%);
+  /* Brand colors - adjusted for dark mode */
+  --color-brand-purple: #cb6ce6;
+  --color-brand-purple-light: #e2a9f1;
+  --color-brand-purple-lighter: #f6d2ef;
+  --color-brand-purple-lightest: #f6d2ef;
+  --color-brand-pink: #ff5ec3;
+  --color-text-dark: #e8edf5;
+  --color-eyebrow: #e2a9f1;
 }
 
 @theme inline {
@@ -62,6 +78,59 @@ body {
   min-height: 100vh;
   font-weight: normal;
   font-style: normal;
+}
+
+/* Theme-aware utility classes */
+.text-foreground {
+  color: var(--color-foreground);
+}
+
+.text-muted {
+  color: var(--color-muted);
+}
+
+.text-primary {
+  color: var(--color-brand-purple);
+}
+
+.text-primary-light {
+  color: var(--color-primary-500);
+}
+
+.text-accent {
+  color: var(--color-accent-500);
+}
+
+.text-brand-purple {
+  color: var(--color-brand-purple);
+}
+
+.text-brand-purple-light {
+  color: var(--color-brand-purple-light);
+}
+
+.text-brand-pink {
+  color: var(--color-brand-pink);
+}
+
+.text-dark {
+  color: var(--color-text-dark);
+}
+
+.bg-surface {
+  background-color: var(--color-surface);
+}
+
+.bg-surface-elevated {
+  background-color: var(--color-surface-elevated);
+}
+
+.border-subtle {
+  border-color: var(--color-border-subtle);
+}
+
+.border-strong {
+  border-color: var(--color-border-strong);
 }
 
 html {
@@ -85,6 +154,15 @@ h3 {
   border: 12px solid #fff;
   overflow: hidden;
   box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.2);
+  position: relative;
+  display: block;
+}
+
+#cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 @media (min-width: 768px) {
@@ -107,12 +185,27 @@ h3 {
 
 #hero-image {
   width: 100%;
-  height: auto;
+  height: 100%;
   object-fit: cover;
   object-position: center;
-  overflow: hidden;
+  display: block;
   vertical-align: middle;
+  opacity: 1;
+  visibility: visible;
+  /* Mask effect - comment out if images aren't visible */
   mask: url("https://raw.githubusercontent.com/supahfunk/supah-codepen/master/painting-sprite-2.png");
+  -webkit-mask: url("https://raw.githubusercontent.com/supahfunk/supah-codepen/master/painting-sprite-2.png");
+  mask-size: contain;
+  -webkit-mask-size: contain;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-position: center;
+}
+
+/* Fallback if mask fails to load */
+#hero-image:not([style*="opacity: 0"]) {
+  opacity: 1 !important;
 }
 
 /* Global Submit Button Styles */
@@ -219,46 +312,48 @@ button[type="submit"]:focus {
 }
 
 .ant-picker-cell {
-  color: #1a032d !important;
+  color: var(--color-foreground) !important;
 }
 
 .ant-picker-cell:hover:not(.ant-picker-cell-disabled):not(
     .ant-picker-cell-selected
   )
   .ant-picker-cell-inner {
-  background: #f6d2ef !important;
+  background: var(--color-brand-purple-lightest) !important;
+  color: var(--color-foreground) !important;
 }
 
 .ant-picker-cell-selected .ant-picker-cell-inner {
-  background: #681155 !important;
+  background: var(--color-brand-purple) !important;
   color: white !important;
 }
 
 .ant-picker-cell-today .ant-picker-cell-inner {
-  border-color: #ff5ec3 !important;
+  border-color: var(--color-brand-pink) !important;
   font-weight: 600 !important;
+  color: var(--color-foreground) !important;
 }
 
 .ant-picker-cell-in-range::before {
-  background: #f6d2ef !important;
+  background: var(--color-brand-purple-lightest) !important;
 }
 
 .ant-picker-today-btn {
-  color: #681155 !important;
+  color: var(--color-brand-purple) !important;
 }
 
 .ant-picker-today-btn:hover {
-  color: #ff5ec3 !important;
+  color: var(--color-brand-pink) !important;
 }
 
 .ant-picker-ok {
-  background: #681155 !important;
-  border-color: #681155 !important;
+  background: var(--color-brand-purple) !important;
+  border-color: var(--color-brand-purple) !important;
 }
 
 .ant-picker-ok:hover {
-  background: #ff5ec3 !important;
-  border-color: #ff5ec3 !important;
+  background: var(--color-brand-pink) !important;
+  border-color: var(--color-brand-pink) !important;
 }
 
 .ant-picker-cell-disabled {
@@ -266,11 +361,11 @@ button[type="submit"]:focus {
 }
 
 .ant-picker-suffix {
-  color: #681155 !important;
+  color: var(--color-brand-purple) !important;
 }
 
 .ant-picker-clear {
-  color: #681155 !important;
+  color: var(--color-brand-purple) !important;
   opacity: 0.6 !important;
 }
 
@@ -279,17 +374,47 @@ button[type="submit"]:focus {
 }
 
 .ant-picker-dropdown .ant-picker-panel {
-  border: 1px solid #f6d2ef !important;
+  border: 1px solid var(--color-brand-purple-lightest) !important;
+  background: var(--color-surface-elevated) !important;
 }
 
 .ant-picker-week-panel-row:hover td {
-  background: #f6d2ef !important;
+  background: var(--color-brand-purple-lightest) !important;
 }
 
 .ant-picker-month-panel-cell-selected .ant-picker-cell-inner,
 .ant-picker-year-panel-cell-selected .ant-picker-cell-inner {
-  background: #681155 !important;
+  background: var(--color-brand-purple) !important;
   color: white !important;
+}
+
+/* Calendar panel background and text colors */
+.ant-picker-panel {
+  background: var(--color-surface-elevated) !important;
+  color: var(--color-foreground) !important;
+}
+
+.ant-picker-content th {
+  color: var(--color-muted) !important;
+}
+
+.ant-picker-header {
+  background: var(--color-surface-elevated) !important;
+  color: var(--color-foreground) !important;
+}
+
+.ant-picker-panel-container {
+  background: var(--color-surface-elevated) !important;
+}
+
+.ant-picker-cell-disabled {
+  color: var(--color-muted) !important;
+  opacity: 0.3 !important;
+}
+
+.ant-picker-cell-disabled .ant-picker-cell-inner {
+  background: transparent !important;
+  color: var(--color-muted) !important;
 }
 
 /* Events Section GSAP Animations */
@@ -311,4 +436,58 @@ button[type="submit"]:focus {
 .event-tag {
   transition: transform 0.3s ease, opacity 0.3s ease;
   will-change: transform, opacity;
+}
+
+/* Events Page Search Input Styles */
+.events-search-input {
+  border-radius: 9999px !important;
+  border: 1px solid var(--color-brand-purple-lighter) !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+  font-family: var(--font-sans) !important;
+  transition: all 0.3s ease !important;
+}
+
+.events-search-input:hover {
+  border-color: var(--color-brand-pink) !important;
+}
+
+.events-search-input:focus,
+.events-search-input-focused {
+  border-color: var(--color-brand-pink) !important;
+  box-shadow: 0 0 0 2px rgba(255, 94, 195, 0.1) !important;
+}
+
+.events-search-input .ant-input {
+  color: var(--color-foreground) !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  padding: 0 !important;
+  font-family: var(--font-sans) !important;
+}
+
+.events-search-input .ant-input::placeholder {
+  color: var(--color-muted) !important;
+}
+
+.events-search-input .ant-input:focus {
+  box-shadow: none !important;
+  border: none !important;
+  outline: none !important;
+}
+
+.events-search-input .ant-input-prefix {
+  margin-right: 8px !important;
+  color: var(--color-muted) !important;
+}
+
+.events-search-input .ant-input-clear-icon {
+  color: var(--color-muted) !important;
+  transition: color 0.3s ease !important;
+}
+
+.events-search-input .ant-input-clear-icon:hover {
+  color: var(--color-foreground) !important;
 }

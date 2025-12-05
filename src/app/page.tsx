@@ -39,7 +39,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen text-[#1A032D]">
+    <div className="min-h-screen text-foreground">
       <MainNavigation />
       <main>
         <HeroSection onCtaClick={() => undefined} />
@@ -49,11 +49,6 @@ export default function HomePage() {
         <ContactSection />
         <RequestEventSection />
       </main>
-      <footer className="border-t border-white/30 font-sans bg-[#681155] py-10 text-center text-sm text-white">
-        <p>
-          © {new Date().getFullYear()} PhotoFest — გაიღიმე · გადაიღე · გააზიარე
-        </p>
-      </footer>
     </div>
   );
 }

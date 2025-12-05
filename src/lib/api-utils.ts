@@ -198,6 +198,7 @@ export function validateShowcaseEvent(data: {
   description: string;
   tags: string[];
   redirectUrl?: string;
+  date?: string;
 }): { valid: boolean; error?: string } {
   if (!data.name || data.name.trim().length < 2) {
     return { valid: false, error: "Event name must be at least 2 characters" };
@@ -232,6 +233,14 @@ export function validateShowcaseEvent(data: {
     }
   }
 
+  // Validate date if provided
+  if (data.date) {
+    const eventDate = new Date(data.date);
+    if (isNaN(eventDate.getTime())) {
+      return { valid: false, error: "Invalid date format" };
+    }
+  }
+
   return { valid: true };
 }
 
@@ -243,6 +252,7 @@ export async function saveShowcaseEvent(data: {
   image?: string;
   imageAlt?: string;
   redirectUrl?: string;
+  date?: string;
 }): Promise<{ id: string; data: EventShowcase; createdAt: string }> {
   await ensureDataDir();
 
@@ -309,6 +319,7 @@ export async function updateShowcaseEvent(
     image?: string;
     imageAlt?: string;
     redirectUrl?: string;
+    date?: string;
   }
 ): Promise<{ id: string; data: EventShowcase; createdAt: string } | null> {
   const filePath = path.join(DATA_DIR, "showcase-events.json");

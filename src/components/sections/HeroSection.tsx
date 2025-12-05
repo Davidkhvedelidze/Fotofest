@@ -135,6 +135,7 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
             </motion.a>
           </div>
         </motion.div>
+
         <motion.div
           className="relative flex w-full items-center justify-center md:w-auto md:flex-1"
           initial={{ opacity: 0, scale: 0.9 }}

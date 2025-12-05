@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { DatePicker } from "antd";
+import dayjs, { type Dayjs } from "dayjs";
 import { EventShowcase } from "@/app/types/type";
 
 interface EditEventFormProps {
@@ -9,7 +11,11 @@ interface EditEventFormProps {
   onCancel: () => void;
 }
 
-export function EditEventForm({ event, onSuccess, onCancel }: EditEventFormProps) {
+export function EditEventForm({
+  event,
+  onSuccess,
+  onCancel,
+}: EditEventFormProps) {
   const [formData, setFormData] = useState<EventShowcase>({
     name: event.name,
     location: event.location,
@@ -18,6 +24,7 @@ export function EditEventForm({ event, onSuccess, onCancel }: EditEventFormProps
     image: event.image || "",
     imageAlt: event.imageAlt || "",
     redirectUrl: event.redirectUrl || "",
+    date: event.date || "",
   });
   const [tagInput, setTagInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,6 +53,14 @@ export function EditEventForm({ event, onSuccess, onCancel }: EditEventFormProps
       ...prev,
       tags: prev.tags.filter((tag) => tag !== tagToRemove),
     }));
+  };
+
+  const handleDateChange = (date: Dayjs | null) => {
+    if (date) {
+      setFormData((prev) => ({ ...prev, date: date.format("YYYY-MM-DD") }));
+    } else {
+      setFormData((prev) => ({ ...prev, date: "" }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -137,6 +152,24 @@ export function EditEventForm({ event, onSuccess, onCancel }: EditEventFormProps
           onChange={handleChange}
           className="w-full rounded-2xl border border-[#E2A9F1] bg-white/90 px-4 py-3 text-[#1A032D] shadow-inner focus:border-[#FF5EC3] focus:outline-none"
           placeholder="Describe the event..."
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="edit-date"
+          className="block text-sm font-semibold text-[#681155] mb-2"
+        >
+          Event Date *
+        </label>
+        <DatePicker
+          id="edit-date"
+          value={formData.date ? dayjs(formData.date) : null}
+          onChange={handleDateChange}
+          format="YYYY-MM-DD"
+          placeholder="Select event date"
+          className="w-full"
+          size="large"
         />
       </div>
 
@@ -273,4 +306,3 @@ export function EditEventForm({ event, onSuccess, onCancel }: EditEventFormProps
     </form>
   );
 }
-

@@ -6,6 +6,7 @@ export interface EventShowcase {
   image?: string;
   imageAlt?: string;
   redirectUrl?: string;
+  date?: string; // ISO date string (YYYY-MM-DD)
 }
 
 export interface NavLink {

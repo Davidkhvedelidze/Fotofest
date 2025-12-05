@@ -178,7 +178,6 @@ export function RequestEventSection() {
           )}
           <div className="md:col-span-2">
             <motion.button
-              type="submit"
               disabled={isSubmitting}
               whileHover={!isSubmitting ? { scale: 1.02 } : {}}
               whileTap={!isSubmitting ? { scale: 0.98 } : {}}

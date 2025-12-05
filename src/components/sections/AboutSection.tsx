@@ -25,7 +25,7 @@ export function AboutSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.4 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
-              className="mt-6 z-10 text-lg text-[#681155]"
+              className="mt-6 z-10 text-lg text-primary"
             >
               PhotoFest-ის გუნდი ქმნის ემოციურ და თანამედროვე ფოტო
               გამოცდილებებს. ჩვენ ვთანამშრომლობთ ბრენდებთან, სააგენტოებთან და
@@ -49,7 +49,7 @@ export function AboutSection() {
                 <p className="text-sm uppercase tracking-[0.4em] text-[#B18CE8]">
                   {highlight.title}
                 </p>
-                <p className="mt-3 text-base text-[#681155]">
+                <p className="mt-3 text-base text-primary">
                   {highlight.description}
                 </p>
               </li>

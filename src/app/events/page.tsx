@@ -3,35 +3,43 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Input } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
 import { EventShowcase } from "@/app/types/type";
 import bgImage from "../../../public/bgElements/Element2.png";
 
 const EVENTS_PER_PAGE = 9;
 
 export default function EventsPage() {
+  const router = useRouter();
   const [events, setEvents] = useState<EventShowcase[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
   useEffect(() => {
     // Fetch showcase events from API
     fetch("/api/showcase-events")
       .then((res) => res.json())
       .then((data) => {
         const apiEvents = data.events || [];
-        // Combine API events with static events, sort by newest first
+        // Combine API events with static events, sort by date (newest first)
         const allEvents = [...apiEvents];
-        // Sort by createdAt if available (newest first)
+        // Sort by date if available, otherwise by createdAt (newest first)
         const sortedEvents = allEvents.sort(
           (
-            a: EventShowcase & { createdAt?: string },
-            b: EventShowcase & { createdAt?: string }
+            a: EventShowcase & { createdAt?: string; date?: string },
+            b: EventShowcase & { createdAt?: string; date?: string }
           ) => {
-            if (a.createdAt && b.createdAt) {
-              return (
-                new Date(b.createdAt).getTime() -
-                new Date(a.createdAt).getTime()
-              );
+            // Prioritize date field, fallback to createdAt
+            const aDate = a.date || a.createdAt;
+            const bDate = b.date || b.createdAt;
+
+            if (aDate && bDate) {
+              return new Date(bDate).getTime() - new Date(aDate).getTime();
             }
+            if (aDate) return -1; // a has date, b doesn't - a comes first
+            if (bDate) return 1; // b has date, a doesn't - b comes first
             return 0;
           }
         );
@@ -46,11 +54,29 @@ export default function EventsPage() {
       });
   }, []);
 
-  // Calculate pagination
-  const totalPages = Math.ceil(events.length / EVENTS_PER_PAGE);
+  // Filter events based on search query
+  const filteredEvents = events.filter((event) => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      event.name.toLowerCase().includes(query) ||
+      event.location.toLowerCase().includes(query) ||
+      event.description.toLowerCase().includes(query) ||
+      event.tags.some((tag) => tag.toLowerCase().includes(query))
+    );
+  });
+
+  // Calculate pagination based on filtered events
+  const totalPages = Math.ceil(filteredEvents.length / EVENTS_PER_PAGE);
   const startIndex = (currentPage - 1) * EVENTS_PER_PAGE;
   const endIndex = startIndex + EVENTS_PER_PAGE;
-  const currentEvents = events.slice(startIndex, endIndex);
+  const currentEvents = filteredEvents.slice(startIndex, endIndex);
+
+  // Handle search query change and reset page
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    setCurrentPage(1);
+  };
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -64,8 +90,9 @@ export default function EventsPage() {
         event.redirectUrl.startsWith("https://")
       ) {
         window.open(event.redirectUrl, "_blank", "noopener,noreferrer");
-      } else {
-        // window?.location?.href = event.redirectUrl;
+      } else if (event.redirectUrl.startsWith("/")) {
+        // Internal route - use Next.js router for client-side navigation
+        router.push(event.redirectUrl);
       }
     }
   };
@@ -73,7 +100,7 @@ export default function EventsPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#F6D2EF] to-[#F9E5F5]">
-        <div className="text-[#681155] text-xl">Loading events...</div>
+        <div className="text-primary text-xl">Loading events...</div>
       </div>
     );
   }
@@ -83,22 +110,47 @@ export default function EventsPage() {
       {/* Header */}
       <header className="bg-white/70 backdrop-blur border-b border-[#E2A9F1]/30">
         <div className="mx-auto max-w-6xl px-6 py-6 lg:px-10">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-[#1A032D]">
+              <h1 className="text-3xl font-bold text-foreground">
                 ყველა ღონისძიება
               </h1>
-              <p className="text-[#681155] mt-2">
-                გაეცანით ჩვენი ბოლო პროექტებს
-              </p>
+              <p className="text-primary mt-2">გაეცანით ჩვენი ბოლო პროექტებს</p>
             </div>
-            <Link
-              href="/"
-              className="px-6 py-2 bg-[#681155] text-white rounded-full text-sm font-semibold hover:bg-[#FF5EC3] transition-colors"
-            >
-              ← უკან
-            </Link>
+            <div className="flex items-center gap-4">
+              {/* Search Input */}
+              <div className="flex-1 md:flex-initial md:w-64">
+                <Input
+                  placeholder="ძიება..."
+                  value={searchQuery}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  prefix={<SearchOutlined className="text-muted" />}
+                  allowClear
+                  size="large"
+                  className="events-search-input"
+                />
+              </div>
+              <Link
+                href="/"
+                className="px-6 py-2.5 bg-[#681155] text-white rounded-full text-sm font-semibold hover:bg-[#FF5EC3] transition-colors whitespace-nowrap"
+              >
+                ← უკან
+              </Link>
+            </div>
           </div>
+          {/* Search Results Count */}
+          {searchQuery && (
+            <div className="mt-4 text-sm text-muted">
+              {filteredEvents.length === 0 ? (
+                <span>შედეგები არ მოიძებნა</span>
+              ) : (
+                <span>
+                  ნაპოვნია {filteredEvents.length}{" "}
+                  {filteredEvents.length === 1 ? "ღონისძიება" : "ღონისძიება"}
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </header>
 
@@ -113,7 +165,17 @@ export default function EventsPage() {
 
           {currentEvents.length === 0 ? (
             <div className="text-center py-16">
-              <p className="text-[#681155] text-xl">No events found</p>
+              <p className="text-primary text-xl">
+                {searchQuery ? "შედეგები არ მოიძებნა" : "ღონისძიებები არ არის"}
+              </p>
+              {searchQuery && (
+                <button
+                  onClick={() => handleSearchChange("")}
+                  className="mt-4 text-primary hover:text-brand-pink underline transition-colors"
+                >
+                  წაშალე ძიება
+                </button>
+              )}
             </div>
           ) : (
             <>
@@ -124,7 +186,7 @@ export default function EventsPage() {
                     <article
                       key={eventWithId.id || `${event.name}-${index}`}
                       onClick={() => handleEventClick(event)}
-                      className={`event-card flex flex-col overflow-hidden rounded-3xl bg-white/80 shadow-lg shadow-[#CB6CE6]/15 backdrop-blur transition-all hover:shadow-xl hover:-translate-y-1 ${
+                      className={`event-card flex flex-col overflow-hidden duration-1000 rounded-3xl bg-white/80 shadow-lg shadow-[#CB6CE6]/15 backdrop-blur transition-transform  hover:shadow-xl group hover:-translate-y-1 ${
                         event.redirectUrl ? "cursor-pointer" : ""
                       }`}
                     >
@@ -134,28 +196,40 @@ export default function EventsPage() {
                             src={event.image}
                             alt={event.imageAlt || event.name}
                             fill
-                            className="object-cover transition-transform duration-500 hover:scale-110"
+                            className="object-cover transition-transform duration-1000 group-hover:scale-110"
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                           />
                         </div>
                       )}
                       <div className="flex flex-col p-8">
                         <div className="space-y-2">
-                          <h3 className="text-2xl font-semibold text-[#1A032D]">
+                          <h3 className="text-2xl font-semibold text-foreground">
                             {event.name}
                           </h3>
-                          <p className="text-sm font-medium uppercase tracking-widest text-[#D26E9C]">
+                          <p className="text-sm font-medium uppercase tracking-widest text-brand-pink">
                             {event.location}
                           </p>
+                          {event.date && (
+                            <p className="text-xs font-medium text-brand-purple mt-1">
+                              {new Date(event.date).toLocaleDateString(
+                                "ka-GE",
+                                {
+                                  year: "numeric",
+                                  month: "2-digit",
+                                  day: "2-digit",
+                                }
+                              )}
+                            </p>
+                          )}
                         </div>
-                        <p className="mt-4 flex-1 text-[#681155]">
+                        <p className="mt-4 flex-1 text-primary">
                           {event.description}
                         </p>
                         <div className="mt-6 flex flex-wrap gap-2">
                           {event.tags.map((tag: string) => (
                             <span
                               key={tag}
-                              className="inline-flex items-center rounded-full bg-[#F6D2EF] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#681155]"
+                              className="inline-flex items-center rounded-full bg-[#F6D2EF] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary"
                             >
                               {tag}
                             </span>
@@ -173,7 +247,7 @@ export default function EventsPage() {
                   <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="px-4 py-2 rounded-full bg-white/80 text-[#681155] font-semibold hover:bg-[#F6D2EF] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 rounded-full bg-white/80 text-primary font-semibold hover:bg-[#F6D2EF] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     ← წინა
                   </button>
@@ -194,7 +268,7 @@ export default function EventsPage() {
                               className={`px-4 py-2 rounded-full font-semibold transition-colors ${
                                 currentPage === page
                                   ? "bg-[#681155] text-white"
-                                  : "bg-white/80 text-[#681155] hover:bg-[#F6D2EF]"
+                                  : "bg-white/80 text-primary hover:bg-[#F6D2EF]"
                               }`}
                             >
                               {page}
@@ -205,7 +279,7 @@ export default function EventsPage() {
                           page === currentPage + 2
                         ) {
                           return (
-                            <span key={page} className="px-2 text-[#681155]">
+                            <span key={page} className="px-2 text-primary">
                               ...
                             </span>
                           );
@@ -218,7 +292,7 @@ export default function EventsPage() {
                   <button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className="px-4 py-2 rounded-full bg-white/80 text-[#681155] font-semibold hover:bg-[#F6D2EF] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 rounded-full bg-white/80 text-primary font-semibold hover:bg-[#F6D2EF] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     შემდეგი →
                   </button>
@@ -230,11 +304,6 @@ export default function EventsPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-white/30 font-sans bg-[#681155] py-10 text-center text-sm text-white mt-12">
-        <p>
-          © {new Date().getFullYear()} PhotoFest — გაიღიმე · გადაიღე · გააზიარე
-        </p>
-      </footer>
     </div>
   );
 }

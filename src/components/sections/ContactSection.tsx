@@ -33,11 +33,11 @@ export function ContactSection() {
                     {channel.icon}
                   </span>
                 )}
-                <p className="text-sm uppercase tracking-[0.4em] text-[#D26E9C]">
+                <p className="text-sm uppercase tracking-[0.4em] text-brand-pink">
                   {channel.label}
                 </p>
               </div>
-              <p className="mt-3 text-xl font-semibold text-[#1A032D] group-hover:text-[#FF5EC3]">
+              <p className="mt-3 text-xl font-semibold text-foreground group-hover:text-brand-pink">
                 {channel.value}
               </p>
             </a>

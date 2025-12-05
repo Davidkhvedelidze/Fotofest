@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { DatePicker } from "antd";
+import dayjs, { type Dayjs } from "dayjs";
 import { EventShowcase } from "@/app/types/type";
 
 export function AddEventForm({ onSuccess }: { onSuccess: () => void }) {
@@ -12,6 +14,7 @@ export function AddEventForm({ onSuccess }: { onSuccess: () => void }) {
     image: "",
     imageAlt: "",
     redirectUrl: "",
+    date: "",
   });
   const [tagInput, setTagInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -42,6 +45,14 @@ export function AddEventForm({ onSuccess }: { onSuccess: () => void }) {
     }));
   };
 
+  const handleDateChange = (date: Dayjs | null) => {
+    if (date) {
+      setFormData((prev) => ({ ...prev, date: date.format("YYYY-MM-DD") }));
+    } else {
+      setFormData((prev) => ({ ...prev, date: "" }));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -69,6 +80,7 @@ export function AddEventForm({ onSuccess }: { onSuccess: () => void }) {
           image: "",
           imageAlt: "",
           redirectUrl: "",
+          date: "",
         });
         onSuccess();
       } else {
@@ -138,6 +150,24 @@ export function AddEventForm({ onSuccess }: { onSuccess: () => void }) {
           onChange={handleChange}
           className="w-full rounded-2xl border border-[#E2A9F1] bg-white/90 px-4 py-3 text-[#1A032D] shadow-inner focus:border-[#FF5EC3] focus:outline-none"
           placeholder="Describe the event..."
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="date"
+          className="block text-sm font-semibold text-[#681155] mb-2"
+        >
+          Event Date *
+        </label>
+        <DatePicker
+          id="date"
+          value={formData.date ? dayjs(formData.date) : null}
+          onChange={handleDateChange}
+          format="YYYY-MM-DD"
+          placeholder="Select event date"
+          className="w-full"
+          size="large"
         />
       </div>
 
@@ -228,16 +258,15 @@ export function AddEventForm({ onSuccess }: { onSuccess: () => void }) {
           {formData.tags.map((tag) => (
             <span
               key={tag}
-              className="inline-flex items-center gap-2 bg-[#F6D2EF] text-[#681155] px-3 py-1 rounded-full text-sm font-semibold"
+              className="inline-flex items-center gap-2 bg-[#F6D2EF] text-[#681155] pl-3  rounded-full text-sm font-semibold"
             >
               {tag}
-              <button
-                type="button"
+              <span
                 onClick={() => handleRemoveTag(tag)}
-                className="hover:text-[#FF5EC3]"
+                className="hover:text-[#FF5EC3] cursor-pointer text-xl font-bold bg-[#681155] text-white rounded-full w-6 h-6 flex items-center justify-center"
               >
                 ×
-              </button>
+              </span>
             </span>
           ))}
         </div>
@@ -265,4 +294,3 @@ export function AddEventForm({ onSuccess }: { onSuccess: () => void }) {
     </form>
   );
 }
-

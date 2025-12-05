@@ -10,6 +10,7 @@ import { EventsSection } from "@/components/sections/EventsSection";
 import { AboutSection } from "@/components/sections/AboutSection";
 import { ContactSection } from "@/components/sections/ContactSection";
 import { RequestEventSection } from "@/components/sections/RequestEventSection";
+import { logError } from "@/lib/services/logger";
 
 export default function HomePage() {
   const api = useApi();
@@ -32,13 +33,13 @@ export default function HomePage() {
   // Optional: Check API health on page load
   useEffect(() => {
     api.checkHealth().catch((err) => {
-      console.error("API health check failed:", err);
+      logError({ message: "API health check failed", error: err });
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <div className="min-h-screen text-[#1A032D]">
+    <div className="min-h-screen text-foreground">
       <MainNavigation />
       <main>
         <HeroSection onCtaClick={() => undefined} />
@@ -48,11 +49,6 @@ export default function HomePage() {
         <ContactSection />
         <RequestEventSection />
       </main>
-      <footer className="border-t border-white/30 font-sans bg-[#681155] py-10 text-center text-sm text-white">
-        <p>
-          © {new Date().getFullYear()} PhotoFest — გაიღიმე · გადაიღე · გააზიარე
-        </p>
-      </footer>
     </div>
   );
 }

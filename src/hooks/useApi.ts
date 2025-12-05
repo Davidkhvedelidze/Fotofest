@@ -1,5 +1,19 @@
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import { RequestEventFormData, EventShowcase } from "@/app/types/type";
+import {
+  addShowcaseEventApi,
+  deleteShowcaseEventApi,
+  getEventRequestsApi,
+  getShowcaseEventsApi,
+  submitEventRequestApi,
+} from "@/features/events/api/eventsClient";
+import {
+  ContactMessagePayload,
+  getContactMessagesApi,
+  sendContactMessageApi,
+} from "@/features/contact/api/contactClient";
+import { fetchHealthStatus } from "@/features/health/api/healthClient";
+import { logError } from "@/lib/services/logger";
 
 interface ApiResponse<T = unknown> {
   data?: T;
@@ -7,58 +21,33 @@ interface ApiResponse<T = unknown> {
   loading: boolean;
 }
 
-interface ContactMessage {
-  name: string;
-  email: string;
-  subject?: string;
-  message: string;
-}
-
 export function useApi() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Health check
   const checkHealth = useCallback(async (): Promise<ApiResponse> => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/health");
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || "Health check failed");
-      }
+      const data = await fetchHealthStatus();
       return { data, loading: false };
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Health check failed";
       setError(errorMessage);
+      logError({ message: "Health check failed", error: err });
       return { error: errorMessage, loading: false };
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Submit event request
   const submitEventRequest = useCallback(
     async (data: RequestEventFormData): Promise<ApiResponse> => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch("/api/events/request", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-          throw new Error(result.error || "Failed to submit event request");
-        }
-
+        const result = await submitEventRequestApi(data);
         return { data: result, loading: false };
       } catch (err) {
         const errorMessage =
@@ -66,6 +55,11 @@ export function useApi() {
             ? err.message
             : "Network error. Please try again later.";
         setError(errorMessage);
+        logError({
+          message: "Failed to submit event request",
+          context: { payload: data },
+          error: err,
+        });
         return { error: errorMessage, loading: false };
       } finally {
         setLoading(false);
@@ -74,18 +68,11 @@ export function useApi() {
     []
   );
 
-  // Get event requests
   const getEventRequests = useCallback(async (): Promise<ApiResponse> => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/events");
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "Failed to fetch event requests");
-      }
-
+      const result = await getEventRequestsApi();
       return { data: result, loading: false };
     } catch (err) {
       const errorMessage =
@@ -93,32 +80,19 @@ export function useApi() {
           ? err.message
           : "Network error. Please try again later.";
       setError(errorMessage);
+      logError({ message: "Failed to fetch event requests", error: err });
       return { error: errorMessage, loading: false };
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Send contact message
   const sendContactMessage = useCallback(
-    async (data: ContactMessage): Promise<ApiResponse> => {
+    async (data: ContactMessagePayload): Promise<ApiResponse> => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch("/api/contact", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-          throw new Error(result.error || "Failed to send contact message");
-        }
-
+        const result = await sendContactMessageApi(data);
         return { data: result, loading: false };
       } catch (err) {
         const errorMessage =
@@ -126,6 +100,11 @@ export function useApi() {
             ? err.message
             : "Network error. Please try again later.";
         setError(errorMessage);
+        logError({
+          message: "Failed to send contact message",
+          context: { payload: data },
+          error: err,
+        });
         return { error: errorMessage, loading: false };
       } finally {
         setLoading(false);
@@ -134,18 +113,11 @@ export function useApi() {
     []
   );
 
-  // Get contact messages
   const getContactMessages = useCallback(async (): Promise<ApiResponse> => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/contact");
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "Failed to fetch contact messages");
-      }
-
+      const result = await getContactMessagesApi();
       return { data: result, loading: false };
     } catch (err) {
       const errorMessage =
@@ -153,24 +125,18 @@ export function useApi() {
           ? err.message
           : "Network error. Please try again later.";
       setError(errorMessage);
+      logError({ message: "Failed to fetch contact messages", error: err });
       return { error: errorMessage, loading: false };
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Get showcase events
   const getShowcaseEvents = useCallback(async (): Promise<ApiResponse> => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/showcase-events");
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "Failed to fetch showcase events");
-      }
-
+      const result = await getShowcaseEventsApi();
       return { data: result, loading: false };
     } catch (err) {
       const errorMessage =
@@ -178,32 +144,19 @@ export function useApi() {
           ? err.message
           : "Network error. Please try again later.";
       setError(errorMessage);
+      logError({ message: "Failed to fetch showcase events", error: err });
       return { error: errorMessage, loading: false };
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Add showcase event
   const addShowcaseEvent = useCallback(
     async (data: EventShowcase): Promise<ApiResponse> => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch("/api/showcase-events", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-          throw new Error(result.error || "Failed to add showcase event");
-        }
-
+        const result = await addShowcaseEventApi(data);
         return { data: result, loading: false };
       } catch (err) {
         const errorMessage =
@@ -211,6 +164,11 @@ export function useApi() {
             ? err.message
             : "Network error. Please try again later.";
         setError(errorMessage);
+        logError({
+          message: "Failed to add showcase event",
+          context: { payload: data },
+          error: err,
+        });
         return { error: errorMessage, loading: false };
       } finally {
         setLoading(false);
@@ -219,22 +177,12 @@ export function useApi() {
     []
   );
 
-  // Delete showcase event
   const deleteShowcaseEvent = useCallback(
     async (id: string): Promise<ApiResponse> => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch(`/api/showcase-events/${id}`, {
-          method: "DELETE",
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-          throw new Error(result.error || "Failed to delete showcase event");
-        }
-
+        const result = await deleteShowcaseEventApi(id);
         return { data: result, loading: false };
       } catch (err) {
         const errorMessage =
@@ -242,6 +190,11 @@ export function useApi() {
             ? err.message
             : "Network error. Please try again later.";
         setError(errorMessage);
+        logError({
+          message: "Failed to delete showcase event",
+          context: { eventId: id },
+          error: err,
+        });
         return { error: errorMessage, loading: false };
       } finally {
         setLoading(false);

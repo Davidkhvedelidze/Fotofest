@@ -1,6 +1,7 @@
 import { EventShowcase, RequestEventFormData } from "@/app/types/type";
 import fs from "fs/promises";
 import path from "path";
+import { validateRedirectUrl, sanitizeRedirectUrl } from "./auth-utils";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 
@@ -46,6 +47,11 @@ export function validateEventRequest(data: RequestEventFormData): {
     return { valid: false, error: "Invalid date format" };
   }
 
+  const now = new Date();
+  if (eventDate <= now) {
+    return { valid: false, error: "Event date must be in the future" };
+  }
+
   return { valid: true };
 }
 
@@ -84,7 +90,11 @@ export async function saveEventRequest(
   };
 
   const filePath = path.join(DATA_DIR, "event-requests.json");
-  let requests: RequestEventFormData[] = [];
+  let requests: Array<{
+    id: string;
+    data: RequestEventFormData;
+    createdAt: string;
+  }> = [];
 
   try {
     const fileContent = await fs.readFile(filePath, "utf-8");
@@ -93,7 +103,7 @@ export async function saveEventRequest(
     // File doesn't exist, start with empty array
   }
 
-  requests.push(data as RequestEventFormData);
+  requests.push(record);
   await fs.writeFile(filePath, JSON.stringify(requests, null, 2));
 
   return record;
@@ -104,7 +114,11 @@ export async function saveContactMessage(data: {
   email: string;
   subject?: string;
   message: string;
-}): Promise<{ id: string; data: RequestEventFormData; createdAt: string }> {
+}): Promise<{
+  id: string;
+  data: { name: string; email: string; subject?: string; message: string };
+  createdAt: string;
+}> {
   await ensureDataDir();
 
   const id = `contact-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -137,20 +151,19 @@ export async function saveContactMessage(data: {
 
   return {
     id,
-    data: data as {
-      name: string;
-      email: string;
-      subject?: string;
-      message: string;
-      mobile: string;
-      eventType: string;
-      date: string;
+    data: {
+      name: data.name,
+      email: data.email,
+      subject: data.subject,
+      message: data.message,
     },
     createdAt: new Date().toISOString(),
   };
 }
 
-export async function getEvents(): Promise<RequestEventFormData[]> {
+export async function getEvents(): Promise<
+  Array<{ id: string; data: RequestEventFormData; createdAt: string }>
+> {
   const filePath = path.join(DATA_DIR, "event-requests.json");
   try {
     const fileContent = await fs.readFile(filePath, "utf-8");
@@ -184,6 +197,8 @@ export function validateShowcaseEvent(data: {
   location: string;
   description: string;
   tags: string[];
+  redirectUrl?: string;
+  date?: string;
 }): { valid: boolean; error?: string } {
   if (!data.name || data.name.trim().length < 2) {
     return { valid: false, error: "Event name must be at least 2 characters" };
@@ -207,6 +222,25 @@ export function validateShowcaseEvent(data: {
     return { valid: false, error: "At least one tag is required" };
   }
 
+  // Validate redirectUrl if provided
+  if (data.redirectUrl) {
+    if (!validateRedirectUrl(data.redirectUrl)) {
+      return {
+        valid: false,
+        error:
+          "Invalid redirect URL. Only http://, https://, or internal paths (/) are allowed.",
+      };
+    }
+  }
+
+  // Validate date if provided
+  if (data.date) {
+    const eventDate = new Date(data.date);
+    if (isNaN(eventDate.getTime())) {
+      return { valid: false, error: "Invalid date format" };
+    }
+  }
+
   return { valid: true };
 }
 
@@ -218,15 +252,25 @@ export async function saveShowcaseEvent(data: {
   image?: string;
   imageAlt?: string;
   redirectUrl?: string;
+  date?: string;
 }): Promise<{ id: string; data: EventShowcase; createdAt: string }> {
   await ensureDataDir();
+
+  // Sanitize redirectUrl if provided
+  let sanitizedRedirectUrl = data.redirectUrl;
+  if (data.redirectUrl) {
+    sanitizedRedirectUrl = sanitizeRedirectUrl(data.redirectUrl) || undefined;
+  }
 
   const id = `showcase-${Date.now()}-${Math.random()
     .toString(36)
     .substr(2, 9)}`;
   const record = {
     id,
-    data: data as EventShowcase,
+    data: {
+      ...data,
+      redirectUrl: sanitizedRedirectUrl,
+    } as EventShowcase,
     createdAt: new Date().toISOString(),
   };
 
@@ -275,6 +319,7 @@ export async function updateShowcaseEvent(
     image?: string;
     imageAlt?: string;
     redirectUrl?: string;
+    date?: string;
   }
 ): Promise<{ id: string; data: EventShowcase; createdAt: string } | null> {
   const filePath = path.join(DATA_DIR, "showcase-events.json");
@@ -291,10 +336,19 @@ export async function updateShowcaseEvent(
       return null;
     }
 
+    // Sanitize redirectUrl if provided
+    let sanitizedRedirectUrl = data.redirectUrl;
+    if (data.redirectUrl) {
+      sanitizedRedirectUrl = sanitizeRedirectUrl(data.redirectUrl) || undefined;
+    }
+
     // Update the event
     events[eventIndex] = {
       ...events[eventIndex],
-      data: data as EventShowcase,
+      data: {
+        ...data,
+        redirectUrl: sanitizedRedirectUrl,
+      } as EventShowcase,
     };
 
     await fs.writeFile(filePath, JSON.stringify(events, null, 2));

@@ -26,13 +26,13 @@ const cardVariants = {
 
 export function ExperiencesSection() {
   return (
-    <section id="experiences" className="bg-white/70 py-24">
-      <div className="mx-auto max-w-6xl px-6 lg:px-10 relative">
-        <Image
-          src={bgImage}
-          alt="Experiences"
-          className="absolute top-0 left-0 w-full h-full scale-125 object-cover"
-        />
+    <section id="experiences" className="bg-white/70 py-24 relative">
+      <Image
+        src={bgImage}
+        alt="Experiences"
+        className="absolute scale-90 top-0 left-0 w-full h-full object-cover"
+      />
+      <div className="mx-auto max-w-6xl px-6 lg:px-10 ">
         <SectionHeading eyebrow="ჯადოსნური სერვისები" align="left">
           თითოეული ზონა ქმნის გამორჩეულ ფოტო გამოცდილებას
         </SectionHeading>

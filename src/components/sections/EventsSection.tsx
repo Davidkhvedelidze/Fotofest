@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -12,6 +13,7 @@ import bgImage from "../../../public/bgElements/Element2.png";
 gsap.registerPlugin(ScrollTrigger);
 
 export function EventsSection() {
+  const router = useRouter();
   const sectionRef = useRef<HTMLElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
   const [events, setEvents] = useState<EventShowcase[]>([]);
@@ -25,20 +27,29 @@ export function EventsSection() {
       .then((res) => res.json())
       .then((data) => {
         const apiEvents = data.events || [];
-        // Combine API events with static events, sort by newest first
+        // Combine API events with static events, sort by createdAt (newest added first)
         const allEvents = [...apiEvents];
-        // Sort by createdAt if available (newest first)
+        // Sort by createdAt (when event was added) - newest added first
         const sortedEvents = allEvents.sort(
           (
-            a: EventShowcase & { createdAt?: string },
-            b: EventShowcase & { createdAt?: string }
+            a: EventShowcase & { createdAt?: string; date?: string },
+            b: EventShowcase & { createdAt?: string; date?: string }
           ) => {
+            // Prioritize createdAt (when event was added) for sorting
             if (a.createdAt && b.createdAt) {
               return (
                 new Date(b.createdAt).getTime() -
                 new Date(a.createdAt).getTime()
               );
             }
+            if (a.createdAt) return -1; // a has createdAt, b doesn't - a comes first
+            if (b.createdAt) return 1; // b has createdAt, a doesn't - b comes first
+            // If no createdAt, fallback to date field
+            if (a.date && b.date) {
+              return new Date(b.date).getTime() - new Date(a.date).getTime();
+            }
+            if (a.date) return -1;
+            if (b.date) return 1;
             return 0;
           }
         );
@@ -213,13 +224,13 @@ export function EventsSection() {
   }, []);
 
   return (
-    <section ref={sectionRef} id="events" className="py-24">
-      <div className="mx-auto max-w-6xl px-6 lg:px-10 relative">
-        <Image
-          src={bgImage}
-          alt="Events"
-          className="absolute top-0 left-0 w-full -z-10 scale-125 h-full  object-cover"
-        />
+    <section ref={sectionRef} id="events" className="py-24 relative">
+      <Image
+        src={bgImage}
+        alt="Events"
+        className="absolute top-0 left-0  -z-10  w-full scale-105 "
+      />
+      <div className="mx-auto max-w-6xl px-6 lg:px-10 ">
         <div className="events-heading">
           <SectionHeading eyebrow="ღონისძიებები" align="left">
             ინსპირაცია ჩვენი ბოლო ივენთებიდან
@@ -243,9 +254,11 @@ export function EventsSection() {
                     "_blank",
                     "noopener,noreferrer"
                   );
-                } else {
-                  window.location.href = event.redirectUrl;
+                } else if (event.redirectUrl.startsWith("/")) {
+                  // Internal route - use Next.js router for client-side navigation
+                  router.push(event.redirectUrl);
                 }
+                // If redirectUrl doesn't match expected patterns, do nothing (safety)
               }
             };
             return (
@@ -269,21 +282,30 @@ export function EventsSection() {
                 )}
                 <div className="flex flex-col p-8">
                   <div className="space-y-2">
-                    <h3 className="text-2xl font-semibold text-[#1A032D]">
+                    <h3 className="text-2xl font-semibold text-foreground">
                       {event.name}
                     </h3>
-                    <p className="text-sm font-medium uppercase tracking-widest text-[#D26E9C]">
+                    <p className="text-sm font-medium uppercase tracking-widest text-brand-pink">
                       {event.location}
                     </p>
+                    {event.date && (
+                      <p className="text-xs font-medium text-brand-purple mt-1">
+                        {new Date(event.date).toLocaleDateString("ka-GE", {
+                          year: "numeric",
+                          month: "2-digit",
+                          day: "2-digit",
+                        })}
+                      </p>
+                    )}
                   </div>
-                  <p className="mt-4 flex-1 text-[#681155]">
+                  <p className="mt-4 flex-1 text-primary">
                     {event.description}
                   </p>
                   <div className="mt-6 flex flex-wrap gap-2">
                     {event.tags.map((tag: string) => (
                       <span
                         key={tag}
-                        className="event-tag inline-flex items-center rounded-full bg-[#F6D2EF] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#681155]"
+                        className="event-tag inline-flex items-center rounded-full bg-[#F6D2EF] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary"
                       >
                         {tag}
                       </span>

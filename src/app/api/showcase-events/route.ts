@@ -39,10 +39,18 @@ export async function POST(request: NextRequest) {
     console.error("Error saving showcase event:", error);
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
+    
+    // Provide helpful error message for Vercel KV setup
+    const isKVError = errorMessage.includes("Vercel KV is not configured");
+    
     return NextResponse.json(
       {
-        error: "Failed to save showcase event",
-        details: process.env.NODE_ENV === "development" ? errorMessage : undefined,
+        error: isKVError 
+          ? "Storage not configured. Please set up Vercel KV in your project settings."
+          : "Failed to save showcase event",
+        details: isKVError || process.env.NODE_ENV === "development" 
+          ? errorMessage 
+          : undefined,
       },
       { status: 500 }
     );

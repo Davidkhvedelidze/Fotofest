@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   // Allow access to login page without authentication
   if (request.nextUrl.pathname.startsWith("/admin/login")) {
     return NextResponse.next();

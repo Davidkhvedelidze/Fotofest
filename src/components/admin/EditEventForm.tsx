@@ -28,6 +28,7 @@ export function EditEventForm({
   });
   const [tagInput, setTagInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -60,6 +61,29 @@ export function EditEventForm({
       setFormData((prev) => ({ ...prev, date: date.format("YYYY-MM-DD") }));
     } else {
       setFormData((prev) => ({ ...prev, date: "" }));
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setError("");
+    setIsUploading(true);
+    try {
+      const formDataUpload = new FormData();
+      formDataUpload.set("file", file);
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formDataUpload,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Upload failed");
+      setFormData((prev) => ({ ...prev, image: data.url }));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Image upload failed");
+    } finally {
+      setIsUploading(false);
+      e.target.value = "";
     }
   };
 
@@ -178,7 +202,7 @@ export function EditEventForm({
           htmlFor="edit-image"
           className="block text-sm font-semibold text-[#681155] mb-2"
         >
-          Image URL
+          Image URL or upload
         </label>
         <input
           id="edit-image"
@@ -186,9 +210,28 @@ export function EditEventForm({
           type="url"
           value={formData.image}
           onChange={handleChange}
-          className="w-full rounded-2xl border border-[#E2A9F1] bg-white/90 px-4 py-3 text-[#1A032D] shadow-inner focus:border-[#FF5EC3] focus:outline-none"
-          placeholder="https://example.com/image.jpg or /images/event.jpg"
+          className="w-full rounded-2xl border border-[#E2A9F1] bg-white/90 px-4 py-3 text-[#1A032D] shadow-inner focus:border-[#FF5EC3] focus:outline-none mb-2"
+          placeholder="https://example.com/image.jpg or upload below"
         />
+        <div className="flex items-center gap-2">
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            onChange={handleFileUpload}
+            disabled={isUploading}
+            className="text-sm text-[#681155] file:mr-3 file:rounded-xl file:border-0 file:bg-[#F6D2EF] file:px-4 file:py-2 file:font-semibold file:text-[#681155] hover:file:bg-[#E2A9F1]"
+          />
+          {isUploading && (
+            <span className="text-sm text-[#681155] opacity-70">
+              Uploading…
+            </span>
+          )}
+        </div>
+        {formData.image && (
+          <p className="text-xs text-[#681155] opacity-70 mt-1 truncate">
+            Current: {formData.image}
+          </p>
+        )}
       </div>
 
       <div>

@@ -10,17 +10,19 @@ export function MainNavigation() {
   const { theme, toggleTheme, mounted } = useTheme();
 
   return (
-    <header className="sticky top-0 z-50 bg-[#681155]/80 backdrop-blur-lg">
+    <header className="sticky top-0 z-50 bg-[#681155]/60 backdrop-blur-lg">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 lg:px-10">
         <a href="#welcome" className="text-xl font-semibold text-white">
           PhotoFest
         </a>
-        <nav className="hidden gap-8 text-sm font-medium text-white md:flex">
+        <nav className="hidden items-center justify-evenly w-full text-sm font-medium h-full text-white md:flex">
           {navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
-              className="transition-colors hover:text-[#FF5EC3]"
+              className="transition-all hover:text-[#FF5EC3]
+              hover:font-bold w-full h-full flex items-center justify-center hover:scale-105  duration-500
+              "
             >
               {link.label}
             </a>

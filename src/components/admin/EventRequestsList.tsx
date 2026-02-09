@@ -1,72 +1,54 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { RequestEventFormData } from "@/app/types/type";
-
-type EventRecord = {
-  id: string;
-  data: RequestEventFormData;
-  createdAt: string;
-};
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { getEventRequestsApi } from "@/features/events/api/eventsClient";
+import {
+  EventRequestRecord,
+  isEventListResponse,
+  isEventRequestRecord,
+} from "@/features/events/types/eventRequests";
 
 export function EventRequestsList() {
-  const [events, setEvents] = useState<EventRecord[]>([]);
+  const [events, setEvents] = useState<EventRequestRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    fetchEvents();
-  }, []);
-
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     try {
-      const response = await fetch("/api/events");
-      const data = await response.json();
+      const data = await getEventRequestsApi();
 
-      if (response.ok) {
-        // Handle both array and object responses
-        const eventsList = Array.isArray(data.events)
-          ? data.events
-          : Array.isArray(data)
-          ? data
-          : [];
+      const normalizedEvents = isEventListResponse(data)
+        ? data.events
+        : Array.isArray(data)
+        ? data.filter(isEventRequestRecord)
+        : [];
 
-        // Sort by createdAt (newest first) and ensure proper typing
-        const sortedEvents = eventsList
-          .map((item: unknown) => {
-            // Handle both old format (just data) and new format (with id/data/createdAt)
-            if (
-              item &&
-              typeof item === "object" &&
-              "id" in item &&
-              "data" in item &&
-              "createdAt" in item
-            ) {
-              return item as EventRecord;
-            }
-            // Legacy format - wrap in record structure
-            return {
-              id: `legacy-${Date.now()}-${Math.random()}`,
-              data: item as RequestEventFormData,
-              createdAt: new Date().toISOString(),
-            } as EventRecord;
-          })
-          .sort(
-            (a: EventRecord, b: EventRecord) =>
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-          );
-        setEvents(sortedEvents);
-      } else {
-        setError("Failed to load event requests");
-      }
-    } catch {
-      setError("Error loading event requests");
+      setEvents(normalizedEvents);
+    } catch (requestError) {
+      const message =
+        requestError instanceof Error
+          ? requestError.message
+          : "Error loading event requests";
+      setError(message);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const formatDate = (dateString: string) => {
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
+
+  const sortedEvents = useMemo(
+    () =>
+      [...events].sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      ),
+    [events]
+  );
+
+  const formatDate = useCallback((dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("ka-GE", {
       year: "numeric",
@@ -75,7 +57,7 @@ export function EventRequestsList() {
       hour: "2-digit",
       minute: "2-digit",
     });
-  };
+  }, []);
 
   if (isLoading) {
     return (
@@ -117,7 +99,7 @@ export function EventRequestsList() {
       </div>
 
       <div className="space-y-4">
-        {events.map((eventRecord) => {
+        {sortedEvents.map((eventRecord) => {
           const event = eventRecord.data;
           const id = eventRecord.id;
           const createdAt = eventRecord.createdAt;

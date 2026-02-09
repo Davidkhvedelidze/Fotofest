@@ -1,14 +1,11 @@
 import { RequestEventFormData, EventShowcase } from "@/app/types/type";
 import { httpRequest, HttpMethod } from "@/lib/services/http";
+import { EventListResponse } from "@/features/events/types/eventRequests";
 
 export interface EventRequestResponse {
   success: boolean;
   message: string;
   id?: string;
-}
-
-export interface EventListResponse {
-  events: RequestEventFormData[];
 }
 
 export interface ShowcaseEventsResponse {

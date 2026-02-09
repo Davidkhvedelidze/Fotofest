@@ -20,7 +20,7 @@ export function EventRequestsList() {
       const normalizedEvents = isEventListResponse(data)
         ? data.events
         : Array.isArray(data)
-        ? data.filter(isEventRequestRecord)
+        ? (data as EventRequestRecord[]).filter(isEventRequestRecord)
         : [];
 
       setEvents(normalizedEvents);

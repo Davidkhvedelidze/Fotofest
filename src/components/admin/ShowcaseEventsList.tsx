@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { EventShowcase } from "@/app/types/type";
 import { EditEventForm } from "./EditEventForm";
+import Image from "next/image";
 
 interface ShowcaseEvent extends EventShowcase {
   id?: string;
@@ -176,9 +177,9 @@ export function ShowcaseEventsList() {
                   <p className="text-sm font-semibold text-[#681155] mb-2">
                     Image:
                   </p>
-                  <p className="text-sm text-[#1A032D] break-all">
-                    {event.image}
-                  </p>
+                  <div className="relative h-48 w-[20%] overflow-hidden rounded-2xl">
+                    <Image src={event.image} alt={event.name} fill />
+                  </div>
                 </div>
               )}
 

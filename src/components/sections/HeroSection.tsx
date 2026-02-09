@@ -105,7 +105,7 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
           <p className="text-sm font-semibold uppercase tracking-[0.4em] text-[#CB6CE6]">
             გაიღიმე · გადაიღე · გააზიარე
           </p>
-          <h1 className="text-3xl font-bold text-[#1A032D] md:text-4xl lg:text-6xl">
+          <h1 className="text-3xl font-bold   md:text-4xl lg:text-6xl">
             ჯადოსნური სარკე, ფოტოკაბინა და 360° გამოცდილება თქვენი
             ღონისძიებისთვის
           </h1>

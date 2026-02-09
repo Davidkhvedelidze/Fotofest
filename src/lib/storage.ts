@@ -3,7 +3,8 @@
  * Supports both file system (local dev) and Vercel KV (production)
  */
 
-import { EventShowcase } from "@/app/types/type";
+import { EventShowcase } from "@/features/events/types/events";
+import { logError } from "@/lib/services/logger";
 
 const STORAGE_KEY = "showcase-events";
 
@@ -33,7 +34,7 @@ async function saveToKV(events: Array<{ id: string; data: EventShowcase; created
     const { kv } = kvModule;
     await kv.set(STORAGE_KEY, JSON.stringify(events));
   } catch (error) {
-    console.error("KV save error:", error);
+    logError({ message: "KV save error", error });
     throw error;
   }
 }
@@ -48,7 +49,7 @@ async function loadFromKV(): Promise<Array<{ id: string; data: EventShowcase; cr
     const data = await kv.get<string>(STORAGE_KEY);
     return data ? JSON.parse(data) : [];
   } catch (error) {
-    console.error("KV load error:", error);
+    logError({ message: "KV load error", error });
     return [];
   }
 }
@@ -64,7 +65,7 @@ async function saveToFile(events: Array<{ id: string; data: EventShowcase; creat
     await fs.mkdir(DATA_DIR, { recursive: true });
     await fs.writeFile(filePath, JSON.stringify(events, null, 2));
   } catch (error) {
-    console.error("File save error:", error);
+    logError({ message: "File save error", error });
     throw error;
   }
 }
@@ -105,7 +106,7 @@ export async function loadEvents(): Promise<Array<{ id: string; data: EventShowc
   // On Vercel, we MUST use KV (file system is read-only)
   if (isVercel()) {
     if (!useKV()) {
-      console.warn("Vercel KV not configured, returning empty array");
+      logError({ message: "Vercel KV not configured, returning empty array" });
       return [];
     }
     return await loadFromKV();
@@ -114,4 +115,3 @@ export async function loadEvents(): Promise<Array<{ id: string; data: EventShowc
     return await loadFromFile();
   }
 }
-

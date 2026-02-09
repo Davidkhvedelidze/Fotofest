@@ -13,7 +13,7 @@ import { RequestEventSection } from "@/components/sections/RequestEventSection";
 import { logError } from "@/lib/services/logger";
 
 export default function HomePage() {
-  const api = useApi();
+  const { checkHealth } = useApi();
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -32,11 +32,10 @@ export default function HomePage() {
 
   // Optional: Check API health on page load
   useEffect(() => {
-    api.checkHealth().catch((err) => {
+    checkHealth().catch((err) => {
       logError({ message: "API health check failed", error: err });
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [checkHealth]);
 
   return (
     <div className="min-h-screen text-foreground">

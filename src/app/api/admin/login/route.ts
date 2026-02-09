@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
+import { logError } from "@/lib/services/logger";
 
 export async function POST(req: Request) {
   const { username, password } = await req.json();
@@ -10,7 +11,7 @@ export async function POST(req: Request) {
   ) {
     const secret = process.env.JWT_SECRET;
     if (!secret) {
-      console.error("JWT_SECRET is not set in environment variables");
+      logError({ message: "JWT_SECRET is not set in environment variables" });
       return NextResponse.json(
         { error: "Server configuration error" },
         { status: 500 }

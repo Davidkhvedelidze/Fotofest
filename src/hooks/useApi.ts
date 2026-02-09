@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { RequestEventFormData, EventShowcase } from "@/app/types/type";
+import { RequestEventFormData, EventShowcase } from "@/features/events/types/events";
 import {
   addShowcaseEventApi,
   deleteShowcaseEventApi,
@@ -8,10 +8,10 @@ import {
   submitEventRequestApi,
 } from "@/features/events/api/eventsClient";
 import {
-  ContactMessagePayload,
   getContactMessagesApi,
   sendContactMessageApi,
 } from "@/features/contact/api/contactClient";
+import { ContactMessagePayload } from "@/features/contact/types/contact";
 import { fetchHealthStatus } from "@/features/health/api/healthClient";
 import { logError } from "@/lib/services/logger";
 

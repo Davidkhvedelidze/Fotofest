@@ -1,4 +1,4 @@
-import { RequestEventFormData } from "@/app/types/type";
+import { RequestEventFormData } from "@/features/events/types/events";
 
 export interface EventRequestRecord {
   id: string;

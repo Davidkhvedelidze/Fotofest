@@ -7,6 +7,7 @@ import { ContactMessagesList } from "@/components/admin/ContactMessagesList";
 import { AdminStats } from "@/components/admin/AdminStats";
 import { AddEventForm } from "@/components/admin/AddEventForm";
 import { ShowcaseEventsList } from "@/components/admin/ShowcaseEventsList";
+import { logError } from "@/lib/services/logger";
 
 type TabType = "events" | "contact" | "showcase";
 
@@ -33,7 +34,7 @@ export default function AdminDashboard() {
           router.push("/admin/login");
         }
       } catch (err) {
-        console.error("Auth check failed:", err);
+        logError({ message: "Admin auth check failed", error: err });
         router.push("/admin/login");
       } finally {
         setIsLoading(false);
@@ -44,10 +45,14 @@ export default function AdminDashboard() {
   }, [router]);
 
   const handleLogout = async () => {
-    await fetch("/api/admin/logout", {
-      method: "POST",
-    });
-    router.push("/admin/login");
+    try {
+      await fetch("/api/admin/logout", {
+        method: "POST",
+      });
+      router.push("/admin/login");
+    } catch (error) {
+      logError({ message: "Admin logout failed", error });
+    }
   };
 
   if (isLoading) {

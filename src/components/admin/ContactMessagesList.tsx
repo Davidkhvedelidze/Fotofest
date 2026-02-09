@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { getContactMessagesApi } from "@/features/contact/api/contactClient";
+import { logError } from "@/lib/services/logger";
 
 interface ContactMessage {
   id: string;
@@ -18,32 +20,25 @@ export function ContactMessagesList() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    fetchMessages();
-  }, []);
-
-  const fetchMessages = async () => {
+  const fetchMessages = useCallback(async () => {
     try {
-      const response = await fetch("/api/contact");
-      const data = await response.json();
-
-      if (response.ok) {
-        // Sort by date (newest first)
-        const sortedMessages = (data.messages || []).sort(
-          (a: ContactMessage, b: ContactMessage) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-        setMessages(sortedMessages);
-      } else {
-        setError("Failed to load contact messages");
-      }
+      const data = await getContactMessagesApi();
+      const sortedMessages = (data.messages || []).sort(
+        (a: ContactMessage, b: ContactMessage) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      setMessages(sortedMessages);
     } catch (err) {
       setError("Error loading contact messages");
-      console.error(err);
+      logError({ message: "Failed to load contact messages", error: err });
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchMessages();
+  }, [fetchMessages]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);

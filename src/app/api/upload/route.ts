@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { put } from "@vercel/blob";
 import { verifyAdminToken } from "@/lib/auth-utils";
+import { logError } from "@/lib/services/logger";
 
 const MAX_SIZE = 4.5 * 1024 * 1024; // 4.5 MB (Vercel serverless limit)
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
@@ -61,7 +62,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ url: blob.url }, { status: 201 });
   } catch (error) {
-    console.error("Upload error:", error);
+    logError({ message: "Upload error", error });
     return NextResponse.json(
       {
         error: error instanceof Error ? error.message : "Upload failed",

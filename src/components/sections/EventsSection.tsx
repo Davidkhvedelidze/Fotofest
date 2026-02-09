@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { EventShowcase } from "@/app/types/type";
+import { EventShowcase } from "@/features/events/types/events";
 import bgImage from "../../../public/bgElements/Element2.png";
+import { getShowcaseEventsApi } from "@/features/events/api/eventsClient";
+import { logError } from "@/lib/services/logger";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -21,47 +23,40 @@ export function EventsSection() {
     Array<{ element: HTMLElement; type: string; handler: EventListener }>
   >([]);
 
-  useEffect(() => {
-    // Fetch showcase events from API
-    fetch("/api/showcase-events")
-      .then((res) => res.json())
-      .then((data) => {
-        const apiEvents = data.events || [];
-        // Combine API events with static events, sort by createdAt (newest added first)
-        const allEvents = [...apiEvents];
-        // Sort by createdAt (when event was added) - newest added first
-        const sortedEvents = allEvents.sort(
-          (
-            a: EventShowcase & { createdAt?: string; date?: string },
-            b: EventShowcase & { createdAt?: string; date?: string }
-          ) => {
-            // Prioritize createdAt (when event was added) for sorting
-            if (a.createdAt && b.createdAt) {
-              return (
-                new Date(b.createdAt).getTime() -
-                new Date(a.createdAt).getTime()
-              );
-            }
-            if (a.createdAt) return -1; // a has createdAt, b doesn't - a comes first
-            if (b.createdAt) return 1; // b has createdAt, a doesn't - b comes first
-            // If no createdAt, fallback to date field
-            if (a.date && b.date) {
-              return new Date(b.date).getTime() - new Date(a.date).getTime();
-            }
-            if (a.date) return -1;
-            if (b.date) return 1;
-            return 0;
+  const fetchShowcaseEvents = useCallback(async () => {
+    try {
+      const data = await getShowcaseEventsApi();
+      const apiEvents = data.events || [];
+      const sortedEvents = [...apiEvents].sort(
+        (
+          a: EventShowcase & { createdAt?: string; date?: string },
+          b: EventShowcase & { createdAt?: string; date?: string }
+        ) => {
+          if (a.createdAt && b.createdAt) {
+            return (
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
           }
-        );
-        // Show only first 6 events on homepage
-        setEvents(sortedEvents.slice(0, 6));
-      })
-      .catch((err) => {
-        console.error("Error fetching showcase events:", err);
-        // Fallback to static events (first 6)
-        setEvents([]);
-      });
+          if (a.createdAt) return -1;
+          if (b.createdAt) return 1;
+          if (a.date && b.date) {
+            return new Date(b.date).getTime() - new Date(a.date).getTime();
+          }
+          if (a.date) return -1;
+          if (b.date) return 1;
+          return 0;
+        }
+      );
+      setEvents(sortedEvents.slice(0, 6));
+    } catch (err) {
+      logError({ message: "Error fetching showcase events", error: err });
+      setEvents([]);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchShowcaseEvents();
+  }, [fetchShowcaseEvents]);
 
   useEffect(() => {
     if (!sectionRef.current || !cardsRef.current) return;

@@ -5,8 +5,10 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { useState, type ChangeEvent, type FormEvent, useCallback } from "react";
 import { DatePicker } from "antd";
 import dayjs, { type Dayjs } from "dayjs";
-import { formFields } from "@/app/data/data";
-import { RequestEventFormData } from "@/app/types/type";
+import { formFields } from "@/lib/constants/marketingData";
+import { RequestEventFormData } from "@/features/events/types/events";
+import { submitEventRequestApi } from "@/features/events/api/eventsClient";
+import { logError } from "@/lib/services/logger";
 
 export function RequestEventSection() {
   const [formData, setFormData] = useState<RequestEventFormData>({
@@ -30,23 +32,13 @@ export function RequestEventSection() {
       setSubmitStatus({ type: null, message: "" });
 
       try {
-        const response = await fetch("/api/events/request", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
+        const result = await submitEventRequestApi(data);
+        if (result.success) {
           setSubmitStatus({
             type: "success",
             message:
               "თქვენი მოთხოვნა წარმატებით გაიგზავნა! ჩვენ მალე დაგიკავშირდებით.",
           });
-          // Reset form
           setFormData({
             name: "",
             email: "",
@@ -59,11 +51,11 @@ export function RequestEventSection() {
           setSubmitStatus({
             type: "error",
             message:
-              result.error || "დაფიქსირდა შეცდომა. გთხოვთ სცადოთ თავიდან.",
+              result.message || "დაფიქსირდა შეცდომა. გთხოვთ სცადოთ თავიდან.",
           });
         }
       } catch (error) {
-        console.error("Error submitting form:", error);
+        logError({ message: "Error submitting event request", error });
         setSubmitStatus({
           type: "error",
           message: "დაფიქსირდა შეცდომა. გთხოვთ სცადოთ თავიდან.",

@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { aboutHighlights } from "@/app/data/data";
+import { aboutHighlights } from "@/lib/constants/marketingData";
 import bgImage from "../../../public/bgElements/Element1.png";
 import Image from "next/image";
 

@@ -1,4 +1,4 @@
-import { EventShowcase, RequestEventFormData } from "@/app/types/type";
+import { EventShowcase, RequestEventFormData } from "@/features/events/types/events";
 import fs from "fs/promises";
 import path from "path";
 import { validateRedirectUrl, sanitizeRedirectUrl } from "./auth-utils";

@@ -1,9 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { EventShowcase } from "@/app/types/type";
+import { useCallback, useEffect, useState } from "react";
+import { EventShowcase } from "@/features/events/types/events";
 import { EditEventForm } from "./EditEventForm";
 import Image from "next/image";
+import {
+  deleteShowcaseEventApi,
+  getShowcaseEventsApi,
+} from "@/features/events/api/eventsClient";
+import { logError } from "@/lib/services/logger";
 
 interface ShowcaseEvent extends EventShowcase {
   id?: string;
@@ -16,53 +21,41 @@ export function ShowcaseEventsList() {
   const [error, setError] = useState("");
   const [editingEvent, setEditingEvent] = useState<ShowcaseEvent | null>(null);
 
-  useEffect(() => {
-    fetchEvents();
-  }, []);
-
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     try {
-      const response = await fetch("/api/showcase-events");
-      const data = await response.json();
-
-      if (response.ok) {
-        const eventsList = Array.isArray(data.events) ? data.events : [];
-        // Sort events by createdAt (newest first)
-        const sortedEvents = eventsList.sort(
-          (a: ShowcaseEvent, b: ShowcaseEvent) => {
-            const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-            const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-            return dateB - dateA; // Descending order (newest first)
-          }
-        );
-        setEvents(sortedEvents);
-      } else {
-        setError("Failed to load showcase events");
-      }
+      const data = await getShowcaseEventsApi();
+      const eventsList = Array.isArray(data.events) ? data.events : [];
+      const sortedEvents = eventsList.sort((a: ShowcaseEvent, b: ShowcaseEvent) => {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return dateB - dateA;
+      });
+      setEvents(sortedEvents);
     } catch (err) {
       setError("Error loading showcase events");
-      console.error(err);
+      logError({ message: "Error loading showcase events", error: err });
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this event?")) return;
 
     try {
-      const response = await fetch(`/api/showcase-events/${id}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
+      const response = await deleteShowcaseEventApi(id);
+      if (response.success) {
         fetchEvents();
       } else {
         alert("Failed to delete event");
       }
     } catch (err) {
       alert("Error deleting event");
-      console.error(err);
+      logError({ message: "Error deleting showcase event", error: err });
     }
   };
 

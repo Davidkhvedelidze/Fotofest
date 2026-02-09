@@ -1,19 +1,12 @@
 import { httpRequest, HttpMethod } from "@/lib/services/http";
-
-export interface ContactMessagePayload {
-  name: string;
-  email: string;
-  subject?: string;
-  message: string;
-}
+import type {
+  ContactMessagePayload,
+  ContactMessagesList,
+} from "@/features/contact/types/contact";
 
 export interface ContactMessageResponse {
   success: boolean;
   message?: string;
-}
-
-export interface ContactMessagesList {
-  messages: ContactMessagePayload[];
 }
 
 export const sendContactMessageApi = (

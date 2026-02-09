@@ -2,6 +2,7 @@ import { EventShowcase, RequestEventFormData } from "@/features/events/types";
 import fs from "fs/promises";
 import path from "path";
 import { validateRedirectUrl, sanitizeRedirectUrl } from "./auth-utils";
+import { logError } from "@/lib/services/logger";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 
@@ -167,10 +168,54 @@ export async function getEvents(): Promise<
   const filePath = path.join(DATA_DIR, "event-requests.json");
   try {
     const fileContent = await fs.readFile(filePath, "utf-8");
-    const events = JSON.parse(fileContent);
+    const events = JSON.parse(fileContent) as unknown;
+    const normalizedEvents = Array.isArray(events)
+      ? events
+          .map((item: unknown) => {
+            if (
+              item &&
+              typeof item === "object" &&
+              "id" in item &&
+              "data" in item &&
+              "createdAt" in item
+            ) {
+              return item as {
+                id: string;
+                data: RequestEventFormData;
+                createdAt: string;
+              };
+            }
+
+            if (item && typeof item === "object") {
+              return {
+                id: `legacy-${Date.now()}-${Math.random()
+                  .toString(36)
+                  .slice(2, 9)}`,
+                data: item as RequestEventFormData,
+                createdAt: new Date().toISOString(),
+              };
+            }
+
+            return null;
+          })
+          .filter(
+            (
+              value
+            ): value is {
+              id: string;
+              data: RequestEventFormData;
+              createdAt: string;
+            } => value !== null
+          )
+      : [];
     // Return events with their metadata
-    return events;
-  } catch {
+    return normalizedEvents;
+  } catch (error) {
+    logError({
+      message: "Failed to load event requests",
+      context: { filePath },
+      error,
+    });
     return [];
   }
 }
@@ -186,7 +231,12 @@ export async function getContactMessages(): Promise<
   try {
     const fileContent = await fs.readFile(filePath, "utf-8");
     return JSON.parse(fileContent);
-  } catch {
+  } catch (error) {
+    logError({
+      message: "Failed to load contact messages",
+      context: { filePath },
+      error,
+    });
     return [];
   }
 }
@@ -344,7 +394,12 @@ export async function deleteShowcaseEvent(id: string): Promise<boolean> {
     const filteredEvents = events.filter((event: { id: string }) => event.id !== id);
     await saveEvents(filteredEvents);
     return true;
-  } catch {
+  } catch (error) {
+    logError({
+      message: "Failed to delete showcase event",
+      context: { id },
+      error,
+    });
     return false;
   }
 }
@@ -359,7 +414,10 @@ export async function sendEventRequestEmail(data: RequestEventFormData) {
   //   subject: `New Event Request: ${data.eventType}`,
   //   body: `New event request from ${data.name}...`
   // });
-  console.log("Email notification (to be implemented):", data);
+  logError({
+    message: "Email notification not configured for event request",
+    context: { data },
+  });
 }
 
 export async function sendContactEmail(data: {
@@ -368,5 +426,8 @@ export async function sendContactEmail(data: {
   message: string;
 }) {
   // TODO: Implement email sending
-  console.log("Contact email notification (to be implemented):", data);
+  logError({
+    message: "Email notification not configured for contact message",
+    context: { data },
+  });
 }

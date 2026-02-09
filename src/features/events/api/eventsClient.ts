@@ -6,15 +6,12 @@ import {
   isShowcaseEventsResponse,
   isSuccessResponse,
 } from "./guards";
+import { EventListResponse } from "@/features/events/types/eventRequests";
 
 export interface EventRequestResponse {
   success: boolean;
   message: string;
   id?: string;
-}
-
-export interface EventListResponse {
-  events: RequestEventFormData[];
 }
 
 export interface ShowcaseEventsResponse {

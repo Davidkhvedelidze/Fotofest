@@ -1,12 +1,12 @@
 import { useCallback, useState } from "react";
-import { RequestEventFormData, EventShowcase } from "@/app/types/type";
+import { RequestEventFormData, EventShowcase } from "@/features/events/types";
 import {
-  addShowcaseEventApi,
-  deleteShowcaseEventApi,
-  getEventRequestsApi,
-  getShowcaseEventsApi,
-  submitEventRequestApi,
-} from "@/features/events/api/eventsClient";
+  createShowcaseEvent,
+  fetchEventRequests,
+  fetchShowcaseEvents,
+  removeShowcaseEvent,
+  submitEventRequest,
+} from "@/features/events/services/eventsService";
 import {
   ContactMessagePayload,
   getContactMessagesApi,
@@ -47,7 +47,7 @@ export function useApi() {
       setLoading(true);
       setError(null);
       try {
-        const result = await submitEventRequestApi(data);
+        const result = await submitEventRequest(data);
         return { data: result, loading: false };
       } catch (err) {
         const errorMessage =
@@ -72,7 +72,7 @@ export function useApi() {
     setLoading(true);
     setError(null);
     try {
-      const result = await getEventRequestsApi();
+      const result = await fetchEventRequests();
       return { data: result, loading: false };
     } catch (err) {
       const errorMessage =
@@ -136,7 +136,7 @@ export function useApi() {
     setLoading(true);
     setError(null);
     try {
-      const result = await getShowcaseEventsApi();
+      const result = await fetchShowcaseEvents();
       return { data: result, loading: false };
     } catch (err) {
       const errorMessage =
@@ -156,7 +156,7 @@ export function useApi() {
       setLoading(true);
       setError(null);
       try {
-        const result = await addShowcaseEventApi(data);
+        const result = await createShowcaseEvent(data);
         return { data: result, loading: false };
       } catch (err) {
         const errorMessage =
@@ -182,7 +182,7 @@ export function useApi() {
       setLoading(true);
       setError(null);
       try {
-        const result = await deleteShowcaseEventApi(id);
+        const result = await removeShowcaseEvent(id);
         return { data: result, loading: false };
       } catch (err) {
         const errorMessage =

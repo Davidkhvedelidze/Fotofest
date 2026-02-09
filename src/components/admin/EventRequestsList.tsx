@@ -1,5 +1,13 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { RequestEventFormData } from "@/features/events/types";
+
+type EventRecord = {
+  id: string;
+  data: RequestEventFormData;
+  createdAt: string;
+};
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { getEventRequestsApi } from "@/features/events/api/eventsClient";
 import {

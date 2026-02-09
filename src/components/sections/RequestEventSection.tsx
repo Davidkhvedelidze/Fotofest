@@ -6,7 +6,7 @@ import { useState, type ChangeEvent, type FormEvent, useCallback } from "react";
 import { DatePicker } from "antd";
 import dayjs, { type Dayjs } from "dayjs";
 import { formFields } from "@/app/data/data";
-import { RequestEventFormData } from "@/app/types/type";
+import { RequestEventFormData } from "@/features/events/types";
 
 export function RequestEventSection() {
   const [formData, setFormData] = useState<RequestEventFormData>({

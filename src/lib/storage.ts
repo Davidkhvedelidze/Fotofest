@@ -3,7 +3,7 @@
  * Supports both file system (local dev) and Vercel KV (production)
  */
 
-import { EventShowcase } from "@/app/types/type";
+import { EventShowcase } from "@/features/events/types";
 
 const STORAGE_KEY = "showcase-events";
 

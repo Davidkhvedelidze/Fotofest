@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { RequestEventFormData } from "@/app/types/type";
+import { RequestEventFormData } from "@/features/events/types";
 
 type EventRecord = {
   id: string;

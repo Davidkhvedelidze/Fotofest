@@ -4,7 +4,7 @@ import {
   getShowcaseEvents,
   validateShowcaseEvent,
 } from "@/lib/api-utils";
-import { EventShowcase } from "@/app/types/type";
+import { EventShowcase } from "@/features/events/types";
 import { verifyAdminToken } from "@/lib/auth-utils";
 
 export async function POST(request: NextRequest) {

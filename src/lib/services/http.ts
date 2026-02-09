@@ -8,7 +8,7 @@ export enum HttpMethod {
   PATCH = "PATCH",
 }
 
-export interface HttpRequestConfig {
+export interface HttpRequestConfig<TResponse = unknown> {
   method?: HttpMethod;
   headers?: HeadersInit;
   body?: unknown;
@@ -16,6 +16,7 @@ export interface HttpRequestConfig {
   retryDelayMs?: number;
   signal?: AbortSignal;
   parseAsJson?: boolean;
+  responseGuard?: (payload: unknown) => payload is TResponse;
 }
 
 export interface HttpError extends Error {
@@ -43,7 +44,7 @@ const shouldRetry = (error: unknown): boolean => {
 
 export async function httpRequest<TResponse>(
   url: string,
-  config: HttpRequestConfig = {}
+  config: HttpRequestConfig<TResponse> = {}
 ): Promise<TResponse> {
   const {
     method = HttpMethod.GET,
@@ -53,6 +54,7 @@ export async function httpRequest<TResponse>(
     retryDelayMs = 300,
     signal,
     parseAsJson = true,
+    responseGuard,
   } = config;
 
   let attempt = 0;
@@ -70,6 +72,13 @@ export async function httpRequest<TResponse>(
       const payload = parseAsJson
         ? ((await response.json()) as TResponse)
         : ((await response.text()) as unknown as TResponse);
+
+      if (responseGuard && !responseGuard(payload)) {
+        const error: HttpError = new Error("Response validation failed");
+        error.status = response.status;
+        error.details = payload;
+        throw error;
+      }
 
       if (!response.ok) {
         const error: HttpError = new Error(

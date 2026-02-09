@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { RequestEventFormData } from "@/app/types/type";
+import { RequestEventFormData } from "@/features/events/types";
 import { saveEventRequest, validateEventRequest } from "@/lib/api-utils";
 
 export async function POST(request: NextRequest) {

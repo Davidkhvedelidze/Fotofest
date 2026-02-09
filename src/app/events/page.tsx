@@ -6,52 +6,37 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Input } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
-import { EventShowcase } from "@/app/types/type";
+import {
+  fetchShowcaseEvents,
+  sortShowcaseEventsByDate,
+  type ShowcaseEventRecord,
+} from "@/features/events/services/eventsService";
+import { logError } from "@/lib/services/logger";
 import bgImage from "../../../public/bgElements/Element2.png";
 
 const EVENTS_PER_PAGE = 9;
 
 export default function EventsPage() {
   const router = useRouter();
-  const [events, setEvents] = useState<EventShowcase[]>([]);
+  const [events, setEvents] = useState<ShowcaseEventRecord[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   useEffect(() => {
-    // Fetch showcase events from API
-    fetch("/api/showcase-events")
-      .then((res) => res.json())
-      .then((data) => {
-        const apiEvents = data.events || [];
-        // Combine API events with static events, sort by date (newest first)
-        const allEvents = [...apiEvents];
-        // Sort by date if available, otherwise by createdAt (newest first)
-        const sortedEvents = allEvents.sort(
-          (
-            a: EventShowcase & { createdAt?: string; date?: string },
-            b: EventShowcase & { createdAt?: string; date?: string }
-          ) => {
-            // Prioritize date field, fallback to createdAt
-            const aDate = a.date || a.createdAt;
-            const bDate = b.date || b.createdAt;
-
-            if (aDate && bDate) {
-              return new Date(bDate).getTime() - new Date(aDate).getTime();
-            }
-            if (aDate) return -1; // a has date, b doesn't - a comes first
-            if (bDate) return 1; // b has date, a doesn't - b comes first
-            return 0;
-          }
-        );
+    const loadShowcaseEvents = async () => {
+      try {
+        const apiEvents = await fetchShowcaseEvents();
+        const sortedEvents = sortShowcaseEventsByDate(apiEvents);
         setEvents(sortedEvents);
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching showcase events:", err);
-        // Fallback to static events
+      } catch (error) {
+        logError({ message: "Error fetching showcase events", error });
         setEvents([]);
+      } finally {
         setIsLoading(false);
-      });
+      }
+    };
+
+    void loadShowcaseEvents();
   }, []);
 
   // Filter events based on search query
@@ -83,7 +68,7 @@ export default function EventsPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleEventClick = (event: EventShowcase) => {
+  const handleEventClick = (event: ShowcaseEventRecord) => {
     if (event.redirectUrl) {
       if (
         event.redirectUrl.startsWith("http://") ||
@@ -181,7 +166,7 @@ export default function EventsPage() {
             <>
               <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                 {currentEvents.map((event, index) => {
-                  const eventWithId = event as EventShowcase & { id?: string };
+                  const eventWithId = event as ShowcaseEventRecord;
                   return (
                     <article
                       key={eventWithId.id || `${event.name}-${index}`}

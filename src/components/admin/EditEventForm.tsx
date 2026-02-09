@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { DatePicker } from "antd";
 import dayjs, { type Dayjs } from "dayjs";
-import { EventShowcase } from "@/app/types/type";
+import { EventShowcase } from "@/features/events/types";
 
 interface EditEventFormProps {
   event: EventShowcase & { id: string };

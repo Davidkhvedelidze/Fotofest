@@ -1,6 +1,6 @@
 "use client";
 
-import { RequestEventFormData } from "@/app/types/type";
+import { RequestEventFormData } from "@/features/events/types";
 import { useEffect, useState } from "react";
 
 interface Stats {

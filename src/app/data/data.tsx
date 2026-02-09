@@ -1,5 +1,5 @@
 import type { ExperienceFeature } from "@/components/sections/ExperiencesSection";
-import { EventShowcase, RequestEventFormData } from "../types/type";
+import { EventShowcase, RequestEventFormData } from "@/features/events/types";
 import photoBooth from "../../../public/products/სარკე.png";
 export const navLinks = [
   { label: "მთავარი", href: "#welcome" },

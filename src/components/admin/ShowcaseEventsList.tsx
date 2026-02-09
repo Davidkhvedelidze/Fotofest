@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { EventShowcase } from "@/app/types/type";
+import { EventShowcase } from "@/features/events/types";
 import { EditEventForm } from "./EditEventForm";
 
 interface ShowcaseEvent extends EventShowcase {

@@ -7,6 +7,7 @@ import {
   isEventListResponse,
   isEventRequestRecord,
 } from "@/features/events/types/eventRequests";
+import { logError } from "@/lib/services/logger";
 
 export function EventRequestsList() {
   const [events, setEvents] = useState<EventRequestRecord[]>([]);
@@ -30,6 +31,7 @@ export function EventRequestsList() {
           ? requestError.message
           : "Error loading event requests";
       setError(message);
+      logError({ message: "Failed to load event requests", error: requestError });
     } finally {
       setIsLoading(false);
     }

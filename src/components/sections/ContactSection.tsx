@@ -2,8 +2,8 @@
 
 import { motion } from "framer-motion";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { contactChannels } from "@/app/data/data";
-import { ContactChannel } from "@/app/types/type";
+import { contactChannels } from "@/lib/constants/marketingData";
+import { ContactChannel } from "@/features/contact/types/contact";
 
 export function ContactSection() {
   return (

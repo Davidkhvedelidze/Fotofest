@@ -33,7 +33,9 @@ export default function RootLayout({
                   if (theme === 'dark') {
                     document.documentElement.setAttribute('data-theme', 'dark');
                   }
-                } catch (e) {}
+                } catch (e) {
+                  console.error('Theme initialization failed', e);
+                }
               })();
             `,
           }}

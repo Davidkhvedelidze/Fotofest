@@ -1,7 +1,10 @@
-import type { ExperienceFeature } from "@/components/sections/ExperiencesSection";
-import { EventShowcase, RequestEventFormData } from "../types/type";
+import type { ExperienceFeature } from "@/features/experiences/types/experience";
+import type { EventShowcase, RequestEventFormData } from "@/features/events/types/events";
+import type { NavLink } from "@/features/navigation/types/navigation";
+import type { ContactChannel } from "@/features/contact/types/contact";
 import photoBooth from "../../../public/products/სარკე.png";
-export const navLinks = [
+
+export const navLinks: NavLink[] = [
   { label: "მთავარი", href: "#welcome" },
   { label: "სერვისები", href: "#experiences" },
   { label: "ჩვენ შესახებ", href: "#about" },
@@ -101,7 +104,7 @@ export const aboutHighlights = [
   },
 ];
 
-export const contactChannels = [
+export const contactChannels: ContactChannel[] = [
   {
     label: "ელფოსტა",
     value: "Photofest2@gmail.com",

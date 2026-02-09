@@ -6,24 +6,9 @@ export interface EventShowcase {
   image?: string;
   imageAlt?: string;
   redirectUrl?: string;
-  date?: string; // ISO date string (YYYY-MM-DD)
-}
-
-export interface NavLink {
-  label: string;
-  href: string;
-}
-
-export interface ContactChannel {
-  label: string;
-  value: string;
-  href: string;
-  icon?: string;
-  isSocial?: boolean;
-}
-
-export interface ContactSectionProps {
-  channels: ContactChannel[];
+  date?: string;
+  id?: string;
+  createdAt?: string;
 }
 
 export interface RequestEventFormData {

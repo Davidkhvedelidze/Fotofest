@@ -3,7 +3,10 @@
 import { useState } from "react";
 import { DatePicker } from "antd";
 import dayjs, { type Dayjs } from "dayjs";
-import { EventShowcase } from "@/app/types/type";
+import { EventShowcase } from "@/features/events/types/events";
+import { updateShowcaseEventApi } from "@/features/events/api/eventsClient";
+import { uploadImage } from "@/lib/services/upload";
+import { logError } from "@/lib/services/logger";
 
 interface EditEventFormProps {
   event: EventShowcase & { id: string };
@@ -70,17 +73,13 @@ export function EditEventForm({
     setError("");
     setIsUploading(true);
     try {
-      const formDataUpload = new FormData();
-      formDataUpload.set("file", file);
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formDataUpload,
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Upload failed");
+      const data = await uploadImage(file);
       setFormData((prev) => ({ ...prev, image: data.url }));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Image upload failed");
+      const message =
+        err instanceof Error ? err.message : "Image upload failed";
+      setError(message);
+      logError({ message: "Image upload failed", error: err });
     } finally {
       setIsUploading(false);
       e.target.value = "";
@@ -94,27 +93,18 @@ export function EditEventForm({
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`/api/showcase-events/${event.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
+      const result = await updateShowcaseEventApi(event.id, formData);
+      if (result.success) {
         setSuccess("Event updated successfully!");
         setTimeout(() => {
           onSuccess();
         }, 1000);
       } else {
-        setError(result.error || "Failed to update event");
+        setError("Failed to update event");
       }
     } catch (err) {
       setError("Error updating event. Please try again.");
-      console.error(err);
+      logError({ message: "Error updating showcase event", error: err });
     } finally {
       setIsSubmitting(false);
     }

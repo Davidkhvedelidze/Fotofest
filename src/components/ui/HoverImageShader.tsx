@@ -2,6 +2,7 @@
 import React, { useEffect, useRef } from "react";
 import * as THREE from "three";
 import gsap from "gsap";
+import { logError } from "@/lib/services/logger";
 
 const HoverImageShader: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -56,7 +57,7 @@ const HoverImageShader: React.FC = () => {
       },
       undefined,
       (error) => {
-        console.error("Error loading base texture:", error);
+        logError({ message: "Error loading base texture", error });
       }
     );
 
@@ -67,7 +68,7 @@ const HoverImageShader: React.FC = () => {
       },
       undefined,
       (error) => {
-        console.error("Error loading hover texture:", error);
+        logError({ message: "Error loading hover texture", error });
       }
     );
 

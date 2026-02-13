@@ -2,18 +2,9 @@
 
 import { motion } from "framer-motion";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { experienceFeatures } from "@/app/data/data";
+import { experienceFeatures } from "@/lib/constants/marketingData";
 import bgImage from "../../../public/bgElements/Element3.png";
 import Image from "next/image";
-
-export interface ExperienceFeature {
-  title: string;
-  description: string;
-  bullets: string[];
-  accentColor: string;
-  image?: string | { src: string; width: number; height: number };
-  imageAlt?: string;
-}
 
 const cardVariants = {
   hidden: { opacity: 0, y: 32 },
@@ -26,7 +17,7 @@ const cardVariants = {
 
 export function ExperiencesSection() {
   return (
-    <section id="experiences" className="bg-white/70 py-24 relative">
+    <section id="experiences" className="bg-section-alt py-24 relative">
       <Image
         src={bgImage}
         alt="Experiences"

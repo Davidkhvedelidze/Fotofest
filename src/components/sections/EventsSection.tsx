@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { EventShowcase } from "@/app/types/type";
+import { EventShowcase } from "@/features/events/types/events";
 import bgImage from "../../../public/bgElements/Element2.png";
+import { getShowcaseEventsApi } from "@/features/events/api/eventsClient";
+import { logError } from "@/lib/services/logger";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -21,46 +23,35 @@ export function EventsSection() {
     Array<{ element: HTMLElement; type: string; handler: EventListener }>
   >([]);
 
-  useEffect(() => {
-    // Fetch showcase events from API
-    fetch("/api/showcase-events")
-      .then((res) => res.json())
-      .then((data) => {
-        const apiEvents = data.events || [];
-        // Combine API events with static events, sort by createdAt (newest added first)
-        const allEvents = [...apiEvents];
-        // Sort by createdAt (when event was added) - newest added first
-        const sortedEvents = allEvents.sort(
-          (
-            a: EventShowcase & { createdAt?: string; date?: string },
-            b: EventShowcase & { createdAt?: string; date?: string }
-          ) => {
-            // Prioritize createdAt (when event was added) for sorting
-            if (a.createdAt && b.createdAt) {
-              return (
-                new Date(b.createdAt).getTime() -
-                new Date(a.createdAt).getTime()
-              );
-            }
-            if (a.createdAt) return -1; // a has createdAt, b doesn't - a comes first
-            if (b.createdAt) return 1; // b has createdAt, a doesn't - b comes first
-            // If no createdAt, fallback to date field
-            if (a.date && b.date) {
-              return new Date(b.date).getTime() - new Date(a.date).getTime();
-            }
-            if (a.date) return -1;
-            if (b.date) return 1;
-            return 0;
+  const fetchShowcaseEvents = useCallback(async () => {
+    try {
+      const data = await getShowcaseEventsApi();
+      const apiEvents = data.events || [];
+      const sortedEvents = [...apiEvents].sort(
+        (
+          a: EventShowcase & { createdAt?: string; date?: string },
+          b: EventShowcase & { createdAt?: string; date?: string }
+        ) => {
+          if (a.createdAt && b.createdAt) {
+            return (
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
           }
-        );
-        // Show only first 6 events on homepage
-        setEvents(sortedEvents.slice(0, 6));
-      })
-      .catch((err) => {
-        console.error("Error fetching showcase events:", err);
-        // Fallback to static events (first 6)
-        setEvents([]);
-      });
+          if (a.createdAt) return -1;
+          if (b.createdAt) return 1;
+          if (a.date && b.date) {
+            return new Date(b.date).getTime() - new Date(a.date).getTime();
+          }
+          if (a.date) return -1;
+          if (b.date) return 1;
+          return 0;
+        }
+      );
+      setEvents(sortedEvents.slice(0, 6));
+    } catch (err) {
+      logError({ message: "Error fetching showcase events", error: err });
+      setEvents([]);
+    }
   }, []);
 
   useEffect(() => {
@@ -223,6 +214,11 @@ export function EventsSection() {
     };
   }, []);
 
+  useEffect(() => {
+    const t = setTimeout(() => fetchShowcaseEvents(), 0);
+    return () => clearTimeout(t);
+  }, [fetchShowcaseEvents]);
+
   return (
     <section ref={sectionRef} id="events" className="py-24 relative">
       <Image
@@ -236,85 +232,87 @@ export function EventsSection() {
             ინსპირაცია ჩვენი ბოლო ივენთებიდან
           </SectionHeading>
         </div>
+
         <div
           ref={cardsRef}
           className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3"
         >
-          {events.map((event, index) => {
-            const eventWithId = event as EventShowcase & { id?: string };
-            const handleClick = () => {
-              if (event.redirectUrl) {
-                // Check if it's an external URL or internal route
-                if (
-                  event.redirectUrl.startsWith("http://") ||
-                  event.redirectUrl.startsWith("https://")
-                ) {
-                  window.open(
-                    event.redirectUrl,
-                    "_blank",
-                    "noopener,noreferrer"
-                  );
-                } else if (event.redirectUrl.startsWith("/")) {
-                  // Internal route - use Next.js router for client-side navigation
-                  router.push(event.redirectUrl);
+          {events &&
+            events.slice(0, 3).map((event, index) => {
+              const eventWithId = event as EventShowcase & { id?: string };
+              const handleClick = () => {
+                if (event.redirectUrl) {
+                  // Check if it's an external URL or internal route
+                  if (
+                    event.redirectUrl.startsWith("http://") ||
+                    event.redirectUrl.startsWith("https://")
+                  ) {
+                    window.open(
+                      event.redirectUrl,
+                      "_blank",
+                      "noopener,noreferrer"
+                    );
+                  } else if (event.redirectUrl.startsWith("/")) {
+                    // Internal route - use Next.js router for client-side navigation
+                    router.push(event.redirectUrl);
+                  }
+                  // If redirectUrl doesn't match expected patterns, do nothing (safety)
                 }
-                // If redirectUrl doesn't match expected patterns, do nothing (safety)
-              }
-            };
-            return (
-              <article
-                key={eventWithId.id || `${event.name}-${index}`}
-                onClick={handleClick}
-                className={`event-card flex flex-col overflow-hidden rounded-3xl bg-white/80 shadow-lg shadow-[#CB6CE6]/15 backdrop-blur ${
-                  event.redirectUrl ? "cursor-pointer" : ""
-                }`}
-              >
-                {event?.image && (
-                  <div className="relative h-48 w-full overflow-hidden">
-                    <Image
-                      src={event.image}
-                      alt={event.imageAlt || event.name}
-                      fill
-                      className="event-image object-cover"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    />
-                  </div>
-                )}
-                <div className="flex flex-col p-8">
-                  <div className="space-y-2">
-                    <h3 className="text-2xl font-semibold text-foreground">
-                      {event.name}
-                    </h3>
-                    <p className="text-sm font-medium uppercase tracking-widest text-brand-pink">
-                      {event.location}
-                    </p>
-                    {event.date && (
-                      <p className="text-xs font-medium text-brand-purple mt-1">
-                        {new Date(event.date).toLocaleDateString("ka-GE", {
-                          year: "numeric",
-                          month: "2-digit",
-                          day: "2-digit",
-                        })}
+              };
+              return (
+                <article
+                  key={eventWithId.id || `${event.name}-${index}`}
+                  onClick={handleClick}
+                  className={`event-card flex flex-col overflow-hidden rounded-3xl bg-card shadow-lg shadow-[#CB6CE6]/15 backdrop-blur ${
+                    event.redirectUrl ? "cursor-pointer" : ""
+                  }`}
+                >
+                  {event?.image && (
+                    <div className="relative h-48 w-full overflow-hidden">
+                      <Image
+                        src={event?.image}
+                        alt={event.imageAlt || event.name}
+                        fill
+                        className="event-image object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      />
+                    </div>
+                  )}
+                  <div className="flex flex-col p-8">
+                    <div className="space-y-2">
+                      <h3 className="text-2xl font-semibold dark:text-black text-foreground">
+                        {event.name}
+                      </h3>
+                      <p className="text-sm font-medium uppercase tracking-widest text-brand-pink">
+                        {event.location}
                       </p>
-                    )}
+                      {event.date && (
+                        <p className="text-xs font-medium text-brand-purple mt-1">
+                          {new Date(event.date).toLocaleDateString("ka-GE", {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                          })}
+                        </p>
+                      )}
+                    </div>
+                    <p className="mt-4 flex-1 text-primary">
+                      {event.description}
+                    </p>
+                    <div className="mt-6 flex flex-wrap gap-2">
+                      {event.tags.map((tag: string) => (
+                        <span
+                          key={tag}
+                          className="event-tag inline-flex items-center rounded-full bg-[#F6D2EF] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                  <p className="mt-4 flex-1 text-primary">
-                    {event.description}
-                  </p>
-                  <div className="mt-6 flex flex-wrap gap-2">
-                    {event.tags.map((tag: string) => (
-                      <span
-                        key={tag}
-                        className="event-tag inline-flex items-center rounded-full bg-[#F6D2EF] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </article>
-            );
-          })}
+                </article>
+              );
+            })}
         </div>
         <div className="mt-12 text-center">
           <Link

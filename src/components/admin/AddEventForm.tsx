@@ -3,7 +3,10 @@
 import { useState } from "react";
 import { DatePicker } from "antd";
 import dayjs, { type Dayjs } from "dayjs";
-import { EventShowcase } from "@/app/types/type";
+import { EventShowcase } from "@/features/events/types/events";
+import { addShowcaseEventApi } from "@/features/events/api/eventsClient";
+import { uploadImage } from "@/lib/services/upload";
+import { logError } from "@/lib/services/logger";
 
 export function AddEventForm({ onSuccess }: { onSuccess: () => void }) {
   const [formData, setFormData] = useState<EventShowcase>({
@@ -60,17 +63,13 @@ export function AddEventForm({ onSuccess }: { onSuccess: () => void }) {
     setError("");
     setIsUploading(true);
     try {
-      const formDataUpload = new FormData();
-      formDataUpload.set("file", file);
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formDataUpload,
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Upload failed");
+      const data = await uploadImage(file);
       setFormData((prev) => ({ ...prev, image: data.url }));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Image upload failed");
+      const message =
+        err instanceof Error ? err.message : "Image upload failed";
+      setError(message);
+      logError({ message: "Image upload failed", error: err });
     } finally {
       setIsUploading(false);
       e.target.value = "";
@@ -84,17 +83,8 @@ export function AddEventForm({ onSuccess }: { onSuccess: () => void }) {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/api/showcase-events", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
+      const result = await addShowcaseEventApi(formData);
+      if (result.success) {
         setSuccess("Event added successfully!");
         setFormData({
           name: "",
@@ -108,11 +98,11 @@ export function AddEventForm({ onSuccess }: { onSuccess: () => void }) {
         });
         onSuccess();
       } else {
-        setError(result.error || "Failed to add event");
+        setError("Failed to add event");
       }
     } catch (err) {
       setError("Error adding event. Please try again.");
-      console.error(err);
+      logError({ message: "Error adding showcase event", error: err });
     } finally {
       setIsSubmitting(false);
     }

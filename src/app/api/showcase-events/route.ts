@@ -4,8 +4,9 @@ import {
   getShowcaseEvents,
   validateShowcaseEvent,
 } from "@/lib/api-utils";
-import { EventShowcase } from "@/app/types/type";
+import { EventShowcase } from "@/features/events/types/events";
 import { verifyAdminToken } from "@/lib/auth-utils";
+import { logError } from "@/lib/services/logger";
 
 export async function POST(request: NextRequest) {
   // Verify admin authentication
@@ -23,9 +24,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: validation.error }, { status: 400 });
     }
 
-    // Save the showcase event
     const savedEvent = await saveShowcaseEvent(body);
-    console.log("Showcase event saved:", savedEvent);
 
     return NextResponse.json(
       {
@@ -36,7 +35,7 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error("Error saving showcase event:", error);
+    logError({ message: "Error saving showcase event", error });
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
 
@@ -65,7 +64,7 @@ export async function GET() {
     const events = await getShowcaseEvents();
     return NextResponse.json({ events }, { status: 200 });
   } catch (error) {
-    console.error("Error fetching showcase events:", error);
+    logError({ message: "Error fetching showcase events", error });
     return NextResponse.json(
       { error: "Failed to fetch showcase events" },
       { status: 500 }

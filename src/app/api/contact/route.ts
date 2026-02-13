@@ -4,6 +4,7 @@ import {
   validateContactMessage,
   getContactMessages,
 } from "@/lib/api-utils";
+import { logError } from "@/lib/services/logger";
 
 interface ContactMessage {
   name: string;
@@ -37,7 +38,7 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error("Error processing contact message:", error);
+    logError({ message: "Error processing contact message", error });
     return NextResponse.json(
       { error: "Failed to process contact message" },
       { status: 500 }
@@ -50,7 +51,7 @@ export async function GET() {
     const messages = await getContactMessages();
     return NextResponse.json({ messages }, { status: 200 });
   } catch (error) {
-    console.error("Error fetching contact messages:", error);
+    logError({ message: "Error fetching contact messages", error });
     return NextResponse.json(
       { error: "Failed to fetch contact messages" },
       { status: 500 }

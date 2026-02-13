@@ -5,6 +5,7 @@ import {
   validateShowcaseEvent,
 } from "@/lib/api-utils";
 import { verifyAdminToken } from "@/lib/auth-utils";
+import { logError } from "@/lib/services/logger";
 
 export async function DELETE(
   request: NextRequest,
@@ -29,7 +30,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Event not found" }, { status: 404 });
     }
   } catch (error) {
-    console.error("Error deleting showcase event:", error);
+    logError({ message: "Error deleting showcase event", error });
     return NextResponse.json(
       { error: "Failed to delete showcase event" },
       { status: 500 }
@@ -71,7 +72,7 @@ export async function PUT(
       return NextResponse.json({ error: "Event not found" }, { status: 404 });
     }
   } catch (error) {
-    console.error("Error updating showcase event:", error);
+    logError({ message: "Error updating showcase event", error });
     return NextResponse.json(
       { error: "Failed to update showcase event" },
       { status: 500 }

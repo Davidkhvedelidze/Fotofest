@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { RequestEventFormData } from "@/app/types/type";
+import { RequestEventFormData } from "@/features/events/types/events";
 import { saveEventRequest, validateEventRequest } from "@/lib/api-utils";
+import { logError } from "@/lib/services/logger";
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,7 +28,7 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error("Error processing event request:", error);
+    logError({ message: "Error processing event request", error });
     return NextResponse.json(
       { error: "Failed to process event request" },
       { status: 500 }

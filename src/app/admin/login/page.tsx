@@ -2,6 +2,8 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { sanitizeRedirectUrl } from "@/lib/utils/redirect";
+import { logError } from "@/lib/services/logger";
 
 function AdminLoginForm() {
   const [username, setUsername] = useState("");
@@ -10,7 +12,8 @@ function AdminLoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectUrl = searchParams.get("redirect") || "/admin";
+  const rawRedirectUrl = searchParams.get("redirect") || "/admin";
+  const redirectUrl = sanitizeRedirectUrl(rawRedirectUrl) ?? "/admin";
 
   useEffect(() => {
     // Check if already authenticated via JWT cookie
@@ -23,8 +26,8 @@ function AdminLoginForm() {
             router.push(redirectUrl);
           }
         }
-      } catch {
-        // Not authenticated, stay on login page
+      } catch (error) {
+        logError({ message: "Admin auth check failed", error });
       }
     };
 
@@ -36,19 +39,24 @@ function AdminLoginForm() {
     setError("");
     setIsLoading(true);
 
-    const res = await fetch("/api/admin/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
 
-    if (res.ok) {
-      router.push(redirectUrl);
-    } else {
-      setError("Invalid username or password");
+      if (res.ok) {
+        router.push(redirectUrl);
+      } else {
+        setError("Invalid username or password");
+      }
+    } catch (loginError) {
+      logError({ message: "Admin login failed", error: loginError });
+      setError("Unable to sign in. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (
@@ -114,9 +122,6 @@ function AdminLoginForm() {
             </button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-[#681155] opacity-70">
-            <p>Default credentials: admin / admin123</p>
-          </div>
         </div>
       </div>
     </div>

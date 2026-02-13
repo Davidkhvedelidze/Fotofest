@@ -1,13 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Input } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
-import { EventShowcase } from "@/app/types/type";
+import { EventShowcase } from "@/features/events/types/events";
 import bgImage from "../../../public/bgElements/Element2.png";
+import { getShowcaseEventsApi } from "@/features/events/api/eventsClient";
+import { logError } from "@/lib/services/logger";
 
 const EVENTS_PER_PAGE = 9;
 
@@ -18,53 +20,51 @@ export default function EventsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   useEffect(() => {
-    // Fetch showcase events from API
-    fetch("/api/showcase-events")
-      .then((res) => res.json())
-      .then((data) => {
+    const fetchEvents = async () => {
+      try {
+        const data = await getShowcaseEventsApi();
         const apiEvents = data.events || [];
-        // Combine API events with static events, sort by date (newest first)
-        const allEvents = [...apiEvents];
-        // Sort by date if available, otherwise by createdAt (newest first)
-        const sortedEvents = allEvents.sort(
+        const sortedEvents = [...apiEvents].sort(
           (
             a: EventShowcase & { createdAt?: string; date?: string },
             b: EventShowcase & { createdAt?: string; date?: string }
           ) => {
-            // Prioritize date field, fallback to createdAt
             const aDate = a.date || a.createdAt;
             const bDate = b.date || b.createdAt;
 
             if (aDate && bDate) {
               return new Date(bDate).getTime() - new Date(aDate).getTime();
             }
-            if (aDate) return -1; // a has date, b doesn't - a comes first
-            if (bDate) return 1; // b has date, a doesn't - b comes first
+            if (aDate) return -1;
+            if (bDate) return 1;
             return 0;
           }
         );
         setEvents(sortedEvents);
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching showcase events:", err);
-        // Fallback to static events
+      } catch (err) {
+        logError({ message: "Error fetching showcase events", error: err });
         setEvents([]);
+      } finally {
         setIsLoading(false);
-      });
+      }
+    };
+
+    fetchEvents();
   }, []);
 
   // Filter events based on search query
-  const filteredEvents = events.filter((event) => {
-    if (!searchQuery.trim()) return true;
+  const filteredEvents = useMemo(() => {
+    if (!searchQuery.trim()) return events;
     const query = searchQuery.toLowerCase();
-    return (
-      event.name.toLowerCase().includes(query) ||
-      event.location.toLowerCase().includes(query) ||
-      event.description.toLowerCase().includes(query) ||
-      event.tags.some((tag) => tag.toLowerCase().includes(query))
-    );
-  });
+    return events.filter((event) => {
+      return (
+        event.name.toLowerCase().includes(query) ||
+        event.location.toLowerCase().includes(query) ||
+        event.description.toLowerCase().includes(query) ||
+        event.tags.some((tag) => tag.toLowerCase().includes(query))
+      );
+    });
+  }, [events, searchQuery]);
 
   // Calculate pagination based on filtered events
   const totalPages = Math.ceil(filteredEvents.length / EVENTS_PER_PAGE);
@@ -186,7 +186,7 @@ export default function EventsPage() {
                     <article
                       key={eventWithId.id || `${event.name}-${index}`}
                       onClick={() => handleEventClick(event)}
-                      className={`event-card flex flex-col overflow-hidden duration-1000 rounded-3xl bg-white/80 shadow-lg shadow-[#CB6CE6]/15 backdrop-blur transition-transform  hover:shadow-xl group hover:-translate-y-1 ${
+                      className={`event-card flex flex-col overflow-hidden duration-1000 rounded-3xl bg-card shadow-lg shadow-[#CB6CE6]/15 backdrop-blur transition-transform hover:shadow-xl group hover:-translate-y-1 ${
                         event.redirectUrl ? "cursor-pointer" : ""
                       }`}
                     >
@@ -203,7 +203,7 @@ export default function EventsPage() {
                       )}
                       <div className="flex flex-col p-8">
                         <div className="space-y-2">
-                          <h3 className="text-2xl font-semibold text-foreground">
+                          <h3 className="text-2xl font-semibold  text-foreground">
                             {event.name}
                           </h3>
                           <p className="text-sm font-medium uppercase tracking-widest text-brand-pink">

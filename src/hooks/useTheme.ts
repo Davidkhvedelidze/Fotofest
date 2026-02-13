@@ -45,8 +45,7 @@ export function useTheme() {
     setMounted(true);
     // Ensure theme is applied (should already be applied by script, but ensure consistency)
     applyTheme(actualTheme);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [applyTheme, theme]);
 
   const toggleTheme = () => {
     if (typeof window === "undefined") return;

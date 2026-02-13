@@ -1,7 +1,10 @@
 "use client";
 
-import { RequestEventFormData } from "@/app/types/type";
-import { useEffect, useState } from "react";
+import { RequestEventFormData } from "@/features/events/types/events";
+import { useCallback, useEffect, useState } from "react";
+import { getEventRequestsApi } from "@/features/events/api/eventsClient";
+import { getContactMessagesApi } from "@/features/contact/api/contactClient";
+import { logError } from "@/lib/services/logger";
 
 interface Stats {
   totalEvents: number;
@@ -19,19 +22,12 @@ export function AdminStats() {
   });
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    fetchStats();
-  }, []);
-
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     try {
-      const [eventsRes, contactsRes] = await Promise.all([
-        fetch("/api/events"),
-        fetch("/api/contact"),
+      const [eventsData, contactsData] = await Promise.all([
+        getEventRequestsApi(),
+        getContactMessagesApi(),
       ]);
-
-      const eventsData = await eventsRes.json();
-      const contactsData = await contactsRes.json();
 
       // Handle both array and object responses
       const events = Array.isArray(eventsData.events)
@@ -75,11 +71,15 @@ export function AdminStats() {
         pendingEvents: events.length, // You can add status field later
       });
     } catch (error) {
-      console.error("Error fetching stats:", error);
+      logError({ message: "Error fetching admin stats", error });
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
 
   if (isLoading) {
     return (

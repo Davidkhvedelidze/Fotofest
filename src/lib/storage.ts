@@ -5,7 +5,8 @@
  * In production on Vercel we use the Upstash Redis REST API via `@upstash/redis`.
  */
 
-import { EventShowcase } from "@/app/types/type";
+import { EventShowcase } from "@/features/events/types/events";
+import { logError } from "@/lib/services/logger";
 
 const STORAGE_KEY = "showcase-events";
 
@@ -48,7 +49,7 @@ async function saveToUpstash(
     const redis = new Redis({ url, token });
     await redis.set(STORAGE_KEY, JSON.stringify(events));
   } catch (error) {
-    console.error("Upstash save error:", error);
+    logError({ message: "KV save error", error });
     throw error;
   }
 }
@@ -78,7 +79,7 @@ async function loadFromUpstash(): Promise<
     const data = await redis.get<string>(STORAGE_KEY);
     return data ? JSON.parse(data) : [];
   } catch (error) {
-    console.error("Upstash load error:", error);
+    logError({ message: "KV load error", error });
     return [];
   }
 }
@@ -96,7 +97,7 @@ async function saveToFile(
     await fs.mkdir(DATA_DIR, { recursive: true });
     await fs.writeFile(filePath, JSON.stringify(events, null, 2));
   } catch (error) {
-    console.error("File save error:", error);
+    logError({ message: "File save error", error });
     throw error;
   }
 }
@@ -139,10 +140,8 @@ export async function loadEvents(): Promise<
 > {
   // On Vercel, we MUST use remote storage (file system is read-only)
   if (isVercel()) {
-    if (!useUpstash()) {
-      console.warn(
-        "Upstash Redis (Storage KV) not configured, returning empty array"
-      );
+    if (!useKV()) {
+      logError({ message: "Vercel KV not configured, returning empty array" });
       return [];
     }
     return await loadFromUpstash();

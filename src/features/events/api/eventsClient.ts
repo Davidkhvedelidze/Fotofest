@@ -1,14 +1,11 @@
-import { RequestEventFormData, EventShowcase } from "@/app/types/type";
+import { RequestEventFormData, EventShowcase } from "@/features/events/types/events";
 import { httpRequest, HttpMethod } from "@/lib/services/http";
+import { EventListResponse } from "@/features/events/types/eventRequests";
 
 export interface EventRequestResponse {
   success: boolean;
   message: string;
   id?: string;
-}
-
-export interface EventListResponse {
-  events: RequestEventFormData[];
 }
 
 export interface ShowcaseEventsResponse {
@@ -50,3 +47,16 @@ export const deleteShowcaseEventApi = (id: string): Promise<{ success: boolean }
     method: HttpMethod.DELETE,
     retries: 1,
   });
+
+export const updateShowcaseEventApi = (
+  id: string,
+  payload: EventShowcase
+): Promise<{ success: boolean; event?: EventShowcase }> =>
+  httpRequest<{ success: boolean; event?: EventShowcase }>(
+    `/api/showcase-events/${id}`,
+    {
+      method: HttpMethod.PUT,
+      body: payload,
+      retries: 1,
+    }
+  );

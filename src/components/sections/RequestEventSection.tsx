@@ -5,8 +5,10 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { useState, type ChangeEvent, type FormEvent, useCallback } from "react";
 import { DatePicker } from "antd";
 import dayjs, { type Dayjs } from "dayjs";
-import { formFields } from "@/app/data/data";
-import { RequestEventFormData } from "@/app/types/type";
+import { formFields } from "@/lib/constants/marketingData";
+import { RequestEventFormData } from "@/features/events/types/events";
+import { submitEventRequestApi } from "@/features/events/api/eventsClient";
+import { logError } from "@/lib/services/logger";
 
 export function RequestEventSection() {
   const [formData, setFormData] = useState<RequestEventFormData>({
@@ -30,23 +32,13 @@ export function RequestEventSection() {
       setSubmitStatus({ type: null, message: "" });
 
       try {
-        const response = await fetch("/api/events/request", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
+        const result = await submitEventRequestApi(data);
+        if (result.success) {
           setSubmitStatus({
             type: "success",
             message:
               "თქვენი მოთხოვნა წარმატებით გაიგზავნა! ჩვენ მალე დაგიკავშირდებით.",
           });
-          // Reset form
           setFormData({
             name: "",
             email: "",
@@ -59,11 +51,11 @@ export function RequestEventSection() {
           setSubmitStatus({
             type: "error",
             message:
-              result.error || "დაფიქსირდა შეცდომა. გთხოვთ სცადოთ თავიდან.",
+              result.message || "დაფიქსირდა შეცდომა. გთხოვთ სცადოთ თავიდან.",
           });
         }
       } catch (error) {
-        console.error("Error submitting form:", error);
+        logError({ message: "Error submitting event request", error });
         setSubmitStatus({
           type: "error",
           message: "დაფიქსირდა შეცდომა. გთხოვთ სცადოთ თავიდან.",
@@ -95,11 +87,13 @@ export function RequestEventSection() {
   };
 
   const inputClassName =
-    "w-full rounded-2xl border border-[#E2A9F1] bg-white/90 px-4 py-3 text-[#1A032D] shadow-inner focus:border-[#FF5EC3] focus:outline-none";
+    "w-full rounded-2xl border px-4 py-3 shadow-inner focus:outline-none " +
+    "border-[var(--color-border-strong)] bg-[var(--color-surface-elevated)] text-foreground placeholder:text-muted " +
+    "focus:border-[var(--color-brand-pink)] focus:ring-2 focus:ring-[var(--color-brand-pink)]/20";
 
   return (
     <section id="request" className="py-24">
-      <div className="mx-auto max-w-5xl rounded-[3rem] bg-white/80 p-10 shadow-2xl shadow-[#CB6CE6]/20 backdrop-blur lg:p-16">
+      <div className="mx-auto max-w-5xl rounded-[3rem] bg-card p-10 shadow-2xl shadow-[#CB6CE6]/20 backdrop-blur lg:p-16">
         <SectionHeading eyebrow="დაგეგმე" align="left">
           მოუყევი PhotoFest-ს შენი ოცნების ღონისძიების შესახებ
         </SectionHeading>
@@ -114,13 +108,13 @@ export function RequestEventSection() {
           {formFields.map((field) => (
             <div
               key={field.id}
-              className={`space-y-2 ${
+              className={`gap-2 flex flex-col ${
                 field.colSpan === 2 ? "md:col-span-2" : ""
               }`}
             >
               <label
                 htmlFor={field.id}
-                className="text-sm font-semibold text-[#681155]"
+                className="text-sm font-semibold text-[#681155] dark:text-white"
               >
                 {field.label}
               </label>
@@ -151,7 +145,7 @@ export function RequestEventSection() {
           <div className="md:col-span-2 space-y-2">
             <label
               htmlFor="message"
-              className="text-sm font-semibold text-[#681155]"
+              className="text-sm font-semibold text-[#681155] pb-2 dark:text-white"
             >
               დამატებითი ინფორმაცია
             </label>
@@ -169,8 +163,8 @@ export function RequestEventSection() {
             <div
               className={`md:col-span-2 rounded-2xl p-4 ${
                 submitStatus.type === "success"
-                  ? "bg-green-50 text-green-800 border border-green-200"
-                  : "bg-red-50 text-red-800 border border-red-200"
+                  ? "bg-green-500/10 text-green-700 border border-green-500/30 dark:text-green-300 dark:border-green-500/50"
+                  : "bg-red-500/10 text-red-700 border border-red-500/30 dark:text-red-300 dark:border-red-500/50"
               }`}
             >
               <p className="text-sm font-medium">{submitStatus.message}</p>
@@ -183,7 +177,7 @@ export function RequestEventSection() {
               whileTap={!isSubmitting ? { scale: 0.98 } : {}}
               className="w-full flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <p className="w-full rounded-full bg-[#681155] px-8 py-4 text-base font-semibold text-white shadow-lg shadow-[#681155]/30 cursor-pointer">
+              <p className="w-full rounded-full bg-[var(--color-brand-purple)] px-8 py-4 text-base font-semibold text-white shadow-lg shadow-[var(--color-brand-purple)]/30 cursor-pointer">
                 {isSubmitting ? "იგზავნება..." : "გაგზავნა"}
               </p>
             </motion.button>

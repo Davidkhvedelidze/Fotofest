@@ -140,7 +140,7 @@ export async function loadEvents(): Promise<
 > {
   // On Vercel, we MUST use remote storage (file system is read-only)
   if (isVercel()) {
-    if (!useKV()) {
+    if (!useUpstash()) {
       logError({ message: "Vercel KV not configured, returning empty array" });
       return [];
     }

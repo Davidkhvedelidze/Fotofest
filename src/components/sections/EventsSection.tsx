@@ -220,7 +220,11 @@ export function EventsSection() {
   }, [fetchShowcaseEvents]);
 
   return (
-    <section ref={sectionRef} id="events" className="py-24 relative">
+    <section
+      ref={sectionRef}
+      id="events"
+      className="py-24 relative overflow-x-hidden md:overflow-x-visible"
+    >
       <Image
         src={bgImage}
         alt="Events"

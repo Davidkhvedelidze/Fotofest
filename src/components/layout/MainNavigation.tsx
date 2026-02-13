@@ -2,16 +2,72 @@
 
 import { navLinks } from "@/lib/constants/marketingData";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTheme } from "@/hooks/useTheme";
 import Image from "next/image";
+
+const SCROLL_DOWN_THRESHOLD = 60;
+const SCROLL_UP_THRESHOLD = 10;
+const MOBILE_BREAKPOINT = 768;
 
 export function MainNavigation() {
   const [isOpen, setIsOpen] = useState(false);
   const { theme, toggleTheme, mounted } = useTheme();
+  const [navVisible, setNavVisible] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+  const lastScrollY = useRef(0);
+  const isMobileRef = useRef(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile =
+        typeof window !== "undefined" && window.innerWidth < MOBILE_BREAKPOINT;
+      isMobileRef.current = mobile;
+      setIsMobile(mobile);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    const handleScroll = () => {
+      const y = window.scrollY ?? document.documentElement.scrollTop;
+      const diff = y - lastScrollY.current;
+      lastScrollY.current = y;
+
+      if (!isMobileRef.current) return;
+      if (diff > SCROLL_DOWN_THRESHOLD) {
+        setNavVisible(false);
+      } else if (diff < -SCROLL_UP_THRESHOLD || y < SCROLL_UP_THRESHOLD) {
+        setNavVisible(true);
+      }
+    };
+
+    let ticking = false;
+    const onScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", checkMobile);
+    };
+  }, []);
 
   return (
-    <header className="sticky top-0 z-[99] bg-[#681155]/60 backdrop-blur-lg">
+    <header
+      className="sticky top-0 z-[99] bg-[#681155]/60 backdrop-blur-lg transition-transform duration-300 ease-out md:!translate-y-0"
+      style={
+        isMobile
+          ? { transform: navVisible ? "translateY(0)" : "translateY(-100%)" }
+          : undefined
+      }
+    >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 lg:px-10">
         <a href="#welcome" className="text-xl font-semibold text-white">
           <Image

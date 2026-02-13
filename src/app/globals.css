@@ -1,6 +1,13 @@
 @import "tailwindcss";
 @import "antd/dist/reset.css";
 
+/* Make dark: variant use data-theme="dark" (not prefers-color-scheme) */
+@custom-variant dark {
+  &&:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+}
+
 @font-face {
   font-family: "DM Merab Kostava";
   src: url("/fonts/dm-merab-kostava.ttf") format("truetype");
@@ -9,6 +16,155 @@
   font-display: swap;
 }
 
+.main {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+.heading {
+  color: #fff;
+  font-size: clamp(3.125rem, 8.083vw + 1.033rem, 7.5rem);
+  line-height: clamp(3.75rem, 6.928vw + 1.957rem, 7.5rem);
+  position: fixed;
+  top: 1.25rem;
+}
+
+.liquid-glass {
+  --glass-size-w: 24.875rem;
+  --glass-size-h: 24.875rem;
+  --glass-padding: 1.875rem;
+  --border-radius: 2rem;
+  --transition: 0.4s cubic-bezier(0.5, 1.5, 0.5, 1);
+  --menu-gap: 1rem;
+  --icon-size: 4rem;
+  --icon-border-radius: 1rem;
+  --icon-padding: 0.75rem;
+  border-radius: var(--border-radius);
+  cursor: grab;
+  height: var(--glass-size-h);
+  padding: var(--glass-padding);
+  position: relative;
+  transition: width var(--transition), height var(--transition),
+    padding var(--transition);
+  width: var(--glass-size-w);
+
+  &.is-expanded {
+    --glass-size-w: 34.375rem;
+    --glass-size-h: 34.75rem;
+    --glass-padding: 2.5rem;
+  }
+}
+
+.liquid-glass--bend {
+  backdrop-filter: blur(3px);
+  border-radius: var(--border-radius);
+  filter: url(#glass-blur);
+  inset: 0;
+  position: absolute;
+  z-index: 0;
+}
+
+.liquid-glass--face {
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.15), 0 0 12px rgba(0, 0, 0, 0.08);
+  inset: 0;
+  position: absolute;
+  z-index: 1;
+}
+
+.liquid-glass--edge {
+  border-radius: var(--border-radius);
+  box-shadow: inset 3px 3px 3px 0 rgba(255, 255, 255, 0.45),
+    inset -3px -3px 3px 0 rgba(255, 255, 255, 0.45);
+  inset: 0;
+  position: absolute;
+  z-index: 0;
+}
+
+.liquid-glass__menus {
+  display: flex;
+  gap: var(--menu-gap);
+  height: 100%;
+  min-height: 0;
+  position: relative;
+  transition: gap var(--transition);
+  z-index: 3;
+
+  .is-expanded & {
+    --menu-gap: 2rem;
+  }
+}
+
+/* Swiper inside liquid glass: fill parent height */
+.hero-swiper.swiper,
+.hero-swiper .swiper-wrapper,
+.hero-swiper .swiper-slide {
+  height: 100%;
+}
+
+.liquid-glass__link {
+  border-radius: var(--icon-border-radius);
+  box-shadow: inset 1px 1px 1px 0 rgba(255, 255, 255, 0.45),
+    inset -1px -1px 1px 0 rgba(255, 255, 255, 0.45);
+  display: flex;
+  height: var(--icon-size);
+  padding: var(--icon-padding);
+  pointer-events: none;
+  transition: width var(--transition), height var(--transition),
+    border-radius var(--transition);
+  width: var(--icon-size);
+  z-index: 3;
+
+  .is-expanded & {
+    --icon-size: 8rem;
+    --icon-border-radius: 2rem;
+    --icon-padding: 1.5rem;
+    cursor: default;
+    pointer-events: auto;
+    box-shadow: inset 1px 2px 2px 0 rgba(255, 255, 255, 0.45),
+      inset -1px -2px 2px 0 rgba(255, 255, 255, 0.45);
+  }
+}
+
+.link-linkedin {
+  background: #1a76ad;
+  background: linear-gradient(
+    90deg,
+    rgba(26, 118, 173, 1) 0%,
+    rgba(40, 142, 201, 1) 100%
+  );
+}
+
+.link-frontendly {
+  /* // background: #a82dfb; */
+  background: #262626;
+  background: linear-gradient(
+    90deg,
+    rgba(38, 38, 38, 1) 0%,
+    rgba(48, 48, 48, 1) 100%
+  );
+}
+
+.description {
+  bottom: 3.125rem;
+  color: #fff;
+  font-family: "Open Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-size: 1.5rem;
+  left: 50%;
+  position: fixed;
+  text-align: center;
+  transform: translateX(-50%);
+}
+
+/*
+ * Theme: light/dark is controlled by data-theme on <html> (see layout.tsx, useTheme).
+ * Override these in [data-theme="dark"] below. Use globally:
+ *   bg-card       – cards, panels (light: white/90, dark: #681155)
+ *   bg-section-alt – alternate section backgrounds (light: white/70, dark: dark tint)
+ *   text-foreground, bg-background, etc. – from @theme / existing variables
+ */
 :root {
   color-scheme: light;
   --color-primary-500: #1f4d82;
@@ -38,6 +194,9 @@
   --color-brand-pink: #ff5ec3;
   --color-text-dark: #1a032d;
   --color-eyebrow: #cb6ce6;
+  /* Theme-aware surfaces (override in [data-theme="dark"]; used via bg-card, bg-section-alt) */
+  --theme-card: rgba(255, 255, 255, 0.9);
+  --theme-section-alt: rgba(255, 255, 255, 0.7);
 }
 
 [data-theme="dark"] {
@@ -63,12 +222,17 @@
   --color-brand-pink: #ff5ec3;
   --color-text-dark: #e8edf5;
   --color-eyebrow: #e2a9f1;
+  /* Theme-aware surfaces */
+  --theme-card: #681155;
+  --theme-section-alt: rgba(21, 28, 45, 0.9);
 }
 
 @theme inline {
   --color-background: var(--color-surface);
   --color-foreground: var(--color-foreground);
   --font-sans: var(--font-sans);
+  --color-card: var(--theme-card);
+  --color-section-alt: var(--theme-section-alt);
 }
 
 body {
@@ -160,9 +324,8 @@ h3 {
 
 #cover img {
   width: 100%;
-  height: 100%;
   object-fit: cover;
-  display: block;
+  height: auto;
 }
 
 @media (min-width: 768px) {
@@ -189,23 +352,6 @@ h3 {
   object-fit: cover;
   object-position: center;
   display: block;
-  vertical-align: middle;
-  opacity: 1;
-  visibility: visible;
-  /* Mask effect - comment out if images aren't visible */
-  mask: url("https://raw.githubusercontent.com/supahfunk/supah-codepen/master/painting-sprite-2.png");
-  -webkit-mask: url("https://raw.githubusercontent.com/supahfunk/supah-codepen/master/painting-sprite-2.png");
-  mask-size: contain;
-  -webkit-mask-size: contain;
-  mask-repeat: no-repeat;
-  -webkit-mask-repeat: no-repeat;
-  mask-position: center;
-  -webkit-mask-position: center;
-}
-
-/* Fallback if mask fails to load */
-#hero-image:not([style*="opacity: 0"]) {
-  opacity: 1 !important;
 }
 
 /* Global Submit Button Styles */
@@ -286,7 +432,7 @@ button[type="submit"]:focus {
 }
 
 .ant-picker-input > input::placeholder {
-  color: rgba(15, 26, 44, 0.45) !important;
+  color: var(--color-muted) !important;
 }
 
 .ant-picker-dropdown {
@@ -490,4 +636,21 @@ button[type="submit"]:focus {
 
 .events-search-input .ant-input-clear-icon:hover {
   color: var(--color-foreground) !important;
+}
+
+/* Sticky cards section (GSAP ScrollTrigger pin) */
+.sticky-cards-section {
+  font-size: 14px;
+}
+
+.sticky-cards-section .card-wrapper:nth-of-type(2n) {
+  transform: rotate(3deg);
+}
+
+.sticky-cards-section .card-wrapper:nth-of-type(2n + 1) {
+  transform: rotate(-3deg);
+}
+
+.sticky-cards-section .card-wrapper:nth-of-type(3n) {
+  transform: rotate(0);
 }

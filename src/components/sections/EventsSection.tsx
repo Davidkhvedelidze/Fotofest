@@ -55,10 +55,6 @@ export function EventsSection() {
   }, []);
 
   useEffect(() => {
-    fetchShowcaseEvents();
-  }, [fetchShowcaseEvents]);
-
-  useEffect(() => {
     if (!sectionRef.current || !cardsRef.current) return;
 
     const ctx = gsap.context(() => {
@@ -218,6 +214,11 @@ export function EventsSection() {
     };
   }, []);
 
+  useEffect(() => {
+    const t = setTimeout(() => fetchShowcaseEvents(), 0);
+    return () => clearTimeout(t);
+  }, [fetchShowcaseEvents]);
+
   return (
     <section ref={sectionRef} id="events" className="py-24 relative">
       <Image
@@ -231,6 +232,7 @@ export function EventsSection() {
             ინსპირაცია ჩვენი ბოლო ივენთებიდან
           </SectionHeading>
         </div>
+
         <div
           ref={cardsRef}
           className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3"
@@ -261,14 +263,14 @@ export function EventsSection() {
                 <article
                   key={eventWithId.id || `${event.name}-${index}`}
                   onClick={handleClick}
-                  className={`event-card flex flex-col overflow-hidden rounded-3xl bg-white/80 shadow-lg shadow-[#CB6CE6]/15 backdrop-blur ${
+                  className={`event-card flex flex-col overflow-hidden rounded-3xl bg-card shadow-lg shadow-[#CB6CE6]/15 backdrop-blur ${
                     event.redirectUrl ? "cursor-pointer" : ""
                   }`}
                 >
                   {event?.image && (
                     <div className="relative h-48 w-full overflow-hidden">
                       <Image
-                        src={event.image}
+                        src={event?.image}
                         alt={event.imageAlt || event.name}
                         fill
                         className="event-image object-cover"
@@ -278,7 +280,7 @@ export function EventsSection() {
                   )}
                   <div className="flex flex-col p-8">
                     <div className="space-y-2">
-                      <h3 className="text-2xl font-semibold text-foreground">
+                      <h3 className="text-2xl font-semibold dark:text-black text-foreground">
                         {event.name}
                       </h3>
                       <p className="text-sm font-medium uppercase tracking-widest text-brand-pink">

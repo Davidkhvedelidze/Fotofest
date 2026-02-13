@@ -5,6 +5,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { aboutHighlights } from "@/lib/constants/marketingData";
 import bgImage from "../../../public/bgElements/Element1.png";
 import Image from "next/image";
+import LiquidGlass from "../ui/LiquidGlass";
 
 export function AboutSection() {
   return (
@@ -25,7 +26,7 @@ export function AboutSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.4 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
-              className="mt-6 z-10 text-lg text-primary"
+              className="mt-6 z-10 text-lg text-[#681155] dark:text-white"
             >
               PhotoFest-ის გუნდი ქმნის ემოციურ და თანამედროვე ფოტო
               გამოცდილებებს. ჩვენ ვთანამშრომლობთ ბრენდებთან, სააგენტოებთან და
@@ -42,17 +43,19 @@ export function AboutSection() {
             className="grid gap-6"
           >
             {aboutHighlights.map((highlight) => (
-              <li
+              <LiquidGlass
                 key={highlight.title}
-                className="rounded-3xl bg-white/80 p-6 shadow-lg shadow-[#E2A9F1]/30 backdrop-blur"
+                className="rounded-3xl h-auto!  p-6 shadow-lg  backdrop-blur"
               >
-                <p className="text-sm uppercase tracking-[0.4em] text-[#B18CE8]">
-                  {highlight.title}
-                </p>
-                <p className="mt-3 text-base text-primary">
-                  {highlight.description}
-                </p>
-              </li>
+                <li>
+                  <p className="text-sm uppercase tracking-[0.4em] text-[#B18CE8] dark:text-white">
+                    {highlight.title}
+                  </p>
+                  <p className="mt-3 text-base text-[#681155] dark:text-white">
+                    {highlight.description}
+                  </p>
+                </li>
+              </LiquidGlass>
             ))}
           </motion.ul>
         </div>

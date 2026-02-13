@@ -186,7 +186,7 @@ export default function EventsPage() {
                     <article
                       key={eventWithId.id || `${event.name}-${index}`}
                       onClick={() => handleEventClick(event)}
-                      className={`event-card flex flex-col overflow-hidden duration-1000 rounded-3xl bg-white/80 shadow-lg shadow-[#CB6CE6]/15 backdrop-blur transition-transform  hover:shadow-xl group hover:-translate-y-1 ${
+                      className={`event-card flex flex-col overflow-hidden duration-1000 rounded-3xl bg-card shadow-lg shadow-[#CB6CE6]/15 backdrop-blur transition-transform hover:shadow-xl group hover:-translate-y-1 ${
                         event.redirectUrl ? "cursor-pointer" : ""
                       }`}
                     >
@@ -203,7 +203,7 @@ export default function EventsPage() {
                       )}
                       <div className="flex flex-col p-8">
                         <div className="space-y-2">
-                          <h3 className="text-2xl font-semibold text-foreground">
+                          <h3 className="text-2xl font-semibold  text-foreground">
                             {event.name}
                           </h3>
                           <p className="text-sm font-medium uppercase tracking-widest text-brand-pink">

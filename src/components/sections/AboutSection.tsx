@@ -10,7 +10,7 @@ import LiquidGlass from "../ui/LiquidGlass";
 export function AboutSection() {
   return (
     <section id="about" className="py-24">
-      <div className="mx-auto max-w-6xl px-6 lg:px-10 relative">
+      <div className="mx-auto max-w-6xl px-6 lg:px-10 relative overflow-x-hidden md:overflow-x-visible">
         <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <Image
             src={bgImage}
@@ -45,7 +45,7 @@ export function AboutSection() {
             {aboutHighlights.map((highlight) => (
               <LiquidGlass
                 key={highlight.title}
-                className="rounded-3xl h-auto!  p-6 shadow-lg  backdrop-blur"
+                className="rounded-3xl z-0! h-auto! w-full!  p-6 shadow-lg  backdrop-blur"
               >
                 <li>
                   <p className="text-sm uppercase tracking-[0.4em] text-[#B18CE8] dark:text-white">

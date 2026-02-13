@@ -122,8 +122,8 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.9, ease: "easeOut", delay: 0.5 }}
         >
-          <div className="w-full h-full absolute top-0 left-0 z-999  md:hidden "></div>
-          <LiquidGlass>
+          <div className="w-full h-full absolute top-0 left-0 z-999  md:hidden  "></div>
+          <LiquidGlass className="z-0!">
             <div className="relative h-full w-full">
               <Swiper
                 modules={[Autoplay, EffectFade]}

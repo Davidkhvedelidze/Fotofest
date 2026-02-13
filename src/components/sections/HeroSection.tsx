@@ -38,6 +38,21 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
   };
 
   useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.to(".floating-blob", {
+        y: "+=24",
+        duration: 6,
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut",
+        stagger: 0.4,
+      });
+    });
+
+    return () => ctx.revert();
+  }, []);
+
+  useEffect(() => {
     const el = document.querySelector(".liquid-glass");
     if (!el) return;
 

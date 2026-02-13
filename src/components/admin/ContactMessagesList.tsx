@@ -2,18 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { getContactMessagesApi } from "@/features/contact/api/contactClient";
+import type { ContactMessage } from "@/features/contact/types/contact";
 import { logError } from "@/lib/services/logger";
-
-interface ContactMessage {
-  id: string;
-  data: {
-    name: string;
-    email: string;
-    subject?: string;
-    message: string;
-  };
-  createdAt: string;
-}
 
 export function ContactMessagesList() {
   const [messages, setMessages] = useState<ContactMessage[]>([]);

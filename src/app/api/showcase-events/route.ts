@@ -38,18 +38,21 @@ export async function POST(request: NextRequest) {
     logError({ message: "Error saving showcase event", error });
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
-    
-    // Provide helpful error message for Vercel KV setup
-    const isKVError = errorMessage.includes("Vercel KV is not configured");
-    
+
+    // Provide helpful error message for storage (Upstash Redis) setup
+    const isStorageError = errorMessage.includes(
+      "Upstash Redis (Storage KV) is not configured"
+    );
+
     return NextResponse.json(
       {
-        error: isKVError 
-          ? "Storage not configured. Please set up Vercel KV in your project settings."
+        error: isStorageError
+          ? "Storage not configured. Please set up Upstash Redis (Storage KV) in your project settings."
           : "Failed to save showcase event",
-        details: isKVError || process.env.NODE_ENV === "development" 
-          ? errorMessage 
-          : undefined,
+        details:
+          isStorageError || process.env.NODE_ENV === "development"
+            ? errorMessage
+            : undefined,
       },
       { status: 500 }
     );

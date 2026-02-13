@@ -322,7 +322,7 @@ export async function saveShowcaseEvent(data: {
     createdAt: new Date().toISOString(),
   };
 
-  // Use storage abstraction (supports both file system and Vercel KV)
+  // Use storage abstraction (supports both file system and Upstash Redis)
   const { loadEvents, saveEvents } = await import("./storage");
   const events = await loadEvents();
   events.push(record);
@@ -332,7 +332,7 @@ export async function saveShowcaseEvent(data: {
 }
 
 export async function getShowcaseEvents(): Promise<EventShowcase[]> {
-  // Use storage abstraction (supports both file system and Vercel KV)
+  // Use storage abstraction (supports both file system and Upstash Redis)
   const { loadEvents } = await import("./storage");
   const events = await loadEvents();
   // Return just the data part, not the full record
@@ -391,7 +391,9 @@ export async function deleteShowcaseEvent(id: string): Promise<boolean> {
     // Use storage abstraction
     const { loadEvents, saveEvents } = await import("./storage");
     const events = await loadEvents();
-    const filteredEvents = events.filter((event: { id: string }) => event.id !== id);
+    const filteredEvents = events.filter(
+      (event: { id: string }) => event.id !== id
+    );
     await saveEvents(filteredEvents);
     return true;
   } catch (error) {

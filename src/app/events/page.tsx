@@ -156,7 +156,7 @@ export default function EventsPage() {
 
       {/* Events Grid */}
       <main className="py-12">
-        <div className="mx-auto max-w-6xl px-6 lg:px-10 relative">
+        <div className="mx-auto max-w-6xl px-6 lg:px-10 relative overflow-x-hidden">
           <Image
             src={bgImage}
             alt="Events"

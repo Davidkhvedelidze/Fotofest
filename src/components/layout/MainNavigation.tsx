@@ -4,16 +4,22 @@ import { navLinks } from "@/lib/constants/marketingData";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useTheme } from "@/hooks/useTheme";
+import Image from "next/image";
 
 export function MainNavigation() {
   const [isOpen, setIsOpen] = useState(false);
   const { theme, toggleTheme, mounted } = useTheme();
 
   return (
-    <header className="sticky top-0 z-99 bg-[#681155]/60 backdrop-blur-lg">
+    <header className="sticky top-0 z-[99] bg-[#681155]/60 backdrop-blur-lg">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 lg:px-10">
         <a href="#welcome" className="text-xl font-semibold text-white">
-          PhotoFest
+          <Image
+            src="/images/photoLogo.png"
+            alt="PhotoFest"
+            width={120}
+            height={120}
+          />
         </a>
         <nav className="hidden items-center justify-evenly w-full text-sm font-medium h-full text-white md:flex">
           {navLinks.map((link) => (

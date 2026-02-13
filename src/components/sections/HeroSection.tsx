@@ -117,11 +117,12 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
         </motion.div>
 
         <motion.div
-          className="relative flex w-full items-center justify-end  md:flex-1"
+          className="relative flex w-full items-center justify-center  md:justify-end  md:flex-1"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.9, ease: "easeOut", delay: 0.5 }}
         >
+          <div className="w-full h-full absolute top-0 left-0 z-999  md:hidden "></div>
           <LiquidGlass>
             <div className="relative h-full w-full">
               <Swiper

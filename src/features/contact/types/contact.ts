@@ -17,6 +17,12 @@ export interface ContactMessagePayload {
   message: string;
 }
 
+export interface ContactMessage {
+  id: string;
+  data: ContactMessagePayload;
+  createdAt: string;
+}
+
 export interface ContactMessagesList {
-  messages: ContactMessagePayload[];
+  messages: ContactMessage[];
 }

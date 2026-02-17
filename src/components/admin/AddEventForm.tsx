@@ -158,8 +158,6 @@ export function AddEventForm({ onSuccess }: { onSuccess: () => void }) {
         <textarea
           id="description"
           name="description"
-          required
-          rows={4}
           value={formData.description}
           onChange={handleChange}
           className="w-full rounded-2xl border border-[#E2A9F1] bg-white/90 px-4 py-3 text-[#1A032D] shadow-inner focus:border-[#FF5EC3] focus:outline-none"

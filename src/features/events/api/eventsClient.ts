@@ -1,5 +1,10 @@
-import { RequestEventFormData, EventShowcase } from "@/features/events/types/events";
+import {
+  RequestEventFormData,
+  EventShowcase,
+} from "@/features/events/types/events";
 import { httpRequest, HttpMethod } from "@/lib/services/http";
+import type { UpdateShowcaseEventResponse } from "./updateShowcaseEventApi";
+import { updateShowcaseEventApi as updateShowcaseEventApiStandalone } from "./updateShowcaseEventApi";
 import { EventListResponse } from "@/features/events/types/eventRequests";
 
 export interface EventRequestResponse {
@@ -42,21 +47,16 @@ export const addShowcaseEventApi = (
     retries: 2,
   });
 
-export const deleteShowcaseEventApi = (id: string): Promise<{ success: boolean }> =>
+export const deleteShowcaseEventApi = (
+  id: string
+): Promise<{ success: boolean }> =>
   httpRequest<{ success: boolean }>(`/api/showcase-events/${id}`, {
     method: HttpMethod.DELETE,
     retries: 1,
   });
-
+// Backwards-compatible re-export using the dedicated module
 export const updateShowcaseEventApi = (
   id: string,
   payload: EventShowcase
-): Promise<{ success: boolean; event?: EventShowcase }> =>
-  httpRequest<{ success: boolean; event?: EventShowcase }>(
-    `/api/showcase-events/${id}`,
-    {
-      method: HttpMethod.PUT,
-      body: payload,
-      retries: 1,
-    }
-  );
+): Promise<UpdateShowcaseEventResponse> =>
+  updateShowcaseEventApiStandalone(id, payload);

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { DatePicker } from "antd";
 import dayjs, { type Dayjs } from "dayjs";
 import { EventShowcase } from "@/features/events/types/events";
-import { updateShowcaseEventApi } from "@/features/events/api/eventsClient";
+import { updateShowcaseEventApi } from "@/features/events/api/updateShowcaseEventApi";
 import { uploadImage } from "@/lib/services/upload";
 import { logError } from "@/lib/services/logger";
 

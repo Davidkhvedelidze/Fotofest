@@ -1,4 +1,7 @@
-import { EventShowcase, RequestEventFormData } from "@/features/events/types/events";
+import {
+  EventShowcase,
+  RequestEventFormData,
+} from "@/features/events/types/events";
 import fs from "fs/promises";
 import path from "path";
 import { validateRedirectUrl, sanitizeRedirectUrl } from "./auth-utils";
@@ -261,12 +264,12 @@ export function validateShowcaseEvent(data: {
     };
   }
 
-  if (!data.description || data.description.trim().length < 10) {
-    return {
-      valid: false,
-      error: "Description must be at least 10 characters",
-    };
-  }
+  // if (!data.description || data.description.trim().length < 2) {
+  //   return {
+  //     valid: false,
+  //     error: "Description must be at least 2 characters",
+  //   };
+  // }
 
   if (!data.tags || !Array.isArray(data.tags) || data.tags.length === 0) {
     return { valid: false, error: "At least one tag is required" };

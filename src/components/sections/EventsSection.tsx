@@ -26,6 +26,7 @@ export function EventsSection() {
   const fetchShowcaseEvents = useCallback(async () => {
     try {
       const data = await getShowcaseEventsApi();
+
       const apiEvents = data.events || [];
       const sortedEvents = [...apiEvents].sort(
         (

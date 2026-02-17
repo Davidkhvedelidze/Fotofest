@@ -26,7 +26,6 @@ export function EventsSection() {
   const fetchShowcaseEvents = useCallback(async () => {
     try {
       const data = await getShowcaseEventsApi();
-
       const apiEvents = data.events || [];
       const sortedEvents = [...apiEvents].sort(
         (
@@ -57,7 +56,6 @@ export function EventsSection() {
 
   useEffect(() => {
     if (!sectionRef.current || !cardsRef.current) return;
-
     const ctx = gsap.context(() => {
       // Section scale animation on scroll - unified single animation
       gsap.fromTo(

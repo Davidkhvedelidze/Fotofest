@@ -327,9 +327,18 @@ export async function saveShowcaseEvent(data: {
 
   // Use storage abstraction (supports both file system and Upstash Redis)
   const { loadEvents, saveEvents } = await import("./storage");
-  const events = await loadEvents();
-  events.push(record);
+  const existing = await loadEvents();
+  // Debug logging to understand Upstash behaviour locally/production
+  logError({
+    message: "saveShowcaseEvent: loaded existing showcase events",
+    context: { count: existing.length },
+  });
+  const events = [...existing, record];
   await saveEvents(events);
+  logError({
+    message: "saveShowcaseEvent: saved showcase events",
+    context: { count: events.length },
+  });
 
   return record;
 }
@@ -338,6 +347,10 @@ export async function getShowcaseEvents(): Promise<EventShowcase[]> {
   // Use storage abstraction (supports both file system and Upstash Redis)
   const { loadEvents } = await import("./storage");
   const events = await loadEvents();
+  logError({
+    message: "getShowcaseEvents: loaded showcase events from storage",
+    context: { count: events.length },
+  });
   // Return just the data part, not the full record
   return events.map(
     (event: { id: string; data: EventShowcase; createdAt: string }) => ({

@@ -121,25 +121,32 @@ async function loadFromFile(): Promise<
 export async function saveEvents(
   events: Array<{ id: string; data: EventShowcase; createdAt: string }>
 ) {
-  // Always use Upstash Storage KV for showcase events (no local JSON file)
-  if (!useUpstash()) {
-    throw new Error(
-      "Upstash Redis (Storage KV) is not configured. Please set UPSTASH_STORAGE_KV_REST_API_URL and UPSTASH_STORAGE_KV_REST_API_TOKEN."
-    );
+  // On Vercel, we MUST use remote storage (file system is read-only)
+  if (isVercel()) {
+    if (!useUpstash()) {
+      throw new Error(
+        "Upstash Redis (Storage KV) is not configured. Please set up Upstash and configure UPSTASH_STORAGE_KV_REST_API_URL and UPSTASH_STORAGE_KV_REST_API_TOKEN in your Vercel project."
+      );
+    }
+    await saveToUpstash(events);
+  } else {
+    // Local development - use file system
+    await saveToFile(events);
   }
-  await saveToUpstash(events);
 }
 
 export async function loadEvents(): Promise<
   Array<{ id: string; data: EventShowcase; createdAt: string }>
 > {
-  // Always use Upstash Storage KV for showcase events
-  if (!useUpstash()) {
-    logError({
-      message:
-        "Upstash Redis (Storage KV) is not configured, returning empty showcase events array",
-    });
-    return [];
+  // On Vercel, we MUST use remote storage (file system is read-only)
+  if (isVercel()) {
+    if (!useUpstash()) {
+      logError({ message: "Vercel KV not configured, returning empty array" });
+      return [];
+    }
+    return await loadFromUpstash();
+  } else {
+    // Local development - use file system
+    return await loadFromFile();
   }
-  return await loadFromUpstash();
 }

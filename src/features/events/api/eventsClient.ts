@@ -32,11 +32,15 @@ export const getEventRequestsApi = (): Promise<EventListResponse> =>
     retries: 1,
   });
 
-export const getShowcaseEventsApi = (): Promise<ShowcaseEventsResponse> =>
-  httpRequest<ShowcaseEventsResponse>("/api/showcase-events", {
+export const getShowcaseEventsApi = (): Promise<ShowcaseEventsResponse> => {
+  // Add a cache-busting query param so that any service worker / HTTP cache
+  // never serves a stale empty list after new events are added.
+  const url = `/api/showcase-events?ts=${Date.now()}`;
+  return httpRequest<ShowcaseEventsResponse>(url, {
     method: HttpMethod.GET,
     retries: 1,
   });
+};
 
 export const addShowcaseEventApi = (
   payload: EventShowcase

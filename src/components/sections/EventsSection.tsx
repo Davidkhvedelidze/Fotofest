@@ -219,113 +219,120 @@ export function EventsSection() {
   }, [fetchShowcaseEvents]);
 
   return (
-    <section
-      ref={sectionRef}
-      id="events"
-      className="py-24 relative overflow-x-hidden md:overflow-x-visible"
-    >
-      <Image
-        src={bgImage}
-        alt="Events"
-        className="absolute top-0 left-0  -z-10  w-full scale-105 "
-      />
-      <div className="mx-auto max-w-6xl px-6 lg:px-10 ">
-        <div className="events-heading">
-          <SectionHeading eyebrow="ღონისძიებები" align="left">
-            ინსპირაცია ჩვენი ბოლო ივენთებიდან
-          </SectionHeading>
-        </div>
-
-        <div
-          ref={cardsRef}
-          className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3"
+    <>
+      {events?.length > 0 && (
+        <section
+          ref={sectionRef}
+          id="events"
+          className="py-24 relative overflow-x-hidden md:overflow-x-visible"
         >
-          {events &&
-            events.slice(0, 3).map((event, index) => {
-              const eventWithId = event as EventShowcase & { id?: string };
-              const handleClick = () => {
-                if (event.redirectUrl) {
-                  // Check if it's an external URL or internal route
-                  if (
-                    event.redirectUrl.startsWith("http://") ||
-                    event.redirectUrl.startsWith("https://")
-                  ) {
-                    window.open(
-                      event.redirectUrl,
-                      "_blank",
-                      "noopener,noreferrer"
-                    );
-                  } else if (event.redirectUrl.startsWith("/")) {
-                    // Internal route - use Next.js router for client-side navigation
-                    router.push(event.redirectUrl);
-                  }
-                  // If redirectUrl doesn't match expected patterns, do nothing (safety)
-                }
-              };
-              return (
-                <article
-                  key={eventWithId.id || `${event.name}-${index}`}
-                  onClick={handleClick}
-                  className={`event-card flex flex-col overflow-hidden rounded-3xl bg-card shadow-lg shadow-[#CB6CE6]/15 backdrop-blur ${
-                    event.redirectUrl ? "cursor-pointer" : ""
-                  }`}
-                >
-                  {event?.image && (
-                    <div className="relative h-48 w-full overflow-hidden">
-                      <Image
-                        src={event?.image}
-                        alt={event.imageAlt || event.name}
-                        fill
-                        className="event-image object-cover"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      />
-                    </div>
-                  )}
-                  <div className="flex flex-col p-8">
-                    <div className="space-y-2">
-                      <h3 className="text-2xl font-semibold dark:text-black text-foreground">
-                        {event.name}
-                      </h3>
-                      <p className="text-sm font-medium uppercase tracking-widest text-brand-pink">
-                        {event.location}
-                      </p>
-                      {event.date && (
-                        <p className="text-xs font-medium text-brand-purple mt-1">
-                          {new Date(event.date).toLocaleDateString("ka-GE", {
-                            year: "numeric",
-                            month: "2-digit",
-                            day: "2-digit",
-                          })}
-                        </p>
+          <Image
+            src={bgImage}
+            alt="Events"
+            className="absolute top-0 left-0  -z-10  w-full scale-105 "
+          />
+          <div className="mx-auto max-w-6xl px-6 lg:px-10 ">
+            <div className="events-heading">
+              <SectionHeading eyebrow="ღონისძიებები" align="left">
+                ინსპირაცია ჩვენი ბოლო ივენთებიდან
+              </SectionHeading>
+            </div>
+
+            <div
+              ref={cardsRef}
+              className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3"
+            >
+              {events &&
+                events.slice(0, 3).map((event, index) => {
+                  const eventWithId = event as EventShowcase & { id?: string };
+                  const handleClick = () => {
+                    if (event.redirectUrl) {
+                      // Check if it's an external URL or internal route
+                      if (
+                        event.redirectUrl.startsWith("http://") ||
+                        event.redirectUrl.startsWith("https://")
+                      ) {
+                        window.open(
+                          event.redirectUrl,
+                          "_blank",
+                          "noopener,noreferrer"
+                        );
+                      } else if (event.redirectUrl.startsWith("/")) {
+                        // Internal route - use Next.js router for client-side navigation
+                        router.push(event.redirectUrl);
+                      }
+                      // If redirectUrl doesn't match expected patterns, do nothing (safety)
+                    }
+                  };
+                  return (
+                    <article
+                      key={eventWithId.id || `${event.name}-${index}`}
+                      onClick={handleClick}
+                      className={`event-card flex flex-col overflow-hidden rounded-3xl bg-card shadow-lg shadow-[#CB6CE6]/15 backdrop-blur ${
+                        event.redirectUrl ? "cursor-pointer" : ""
+                      }`}
+                    >
+                      {event?.image && (
+                        <div className="relative h-48 w-full overflow-hidden">
+                          <Image
+                            src={event?.image}
+                            alt={event.imageAlt || event.name}
+                            fill
+                            className="event-image object-cover"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          />
+                        </div>
                       )}
-                    </div>
-                    <p className="mt-4 flex-1 text-primary">
-                      {event.description}
-                    </p>
-                    <div className="mt-6 flex flex-wrap gap-2">
-                      {event.tags.map((tag: string) => (
-                        <span
-                          key={tag}
-                          className="event-tag inline-flex items-center rounded-full bg-[#F6D2EF] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
-        </div>
-        <div className="mt-12 text-center">
-          <Link
-            href="/events"
-            className="inline-flex items-center justify-center rounded-full bg-[#681155] px-8 py-4 text-base font-semibold text-white shadow-lg shadow-[#681155]/30 hover:bg-[#FF5EC3] transition-colors"
-          >
-            იხილე მეტი ღონისძიება →
-          </Link>
-        </div>
-      </div>
-    </section>
+                      <div className="flex flex-col p-8">
+                        <div className="space-y-2">
+                          <h3 className="text-2xl font-semibold dark:text-black text-foreground">
+                            {event.name}
+                          </h3>
+                          <p className="text-sm font-medium uppercase tracking-widest text-brand-pink">
+                            {event.location}
+                          </p>
+                          {event.date && (
+                            <p className="text-xs font-medium text-brand-purple mt-1">
+                              {new Date(event.date).toLocaleDateString(
+                                "ka-GE",
+                                {
+                                  year: "numeric",
+                                  month: "2-digit",
+                                  day: "2-digit",
+                                }
+                              )}
+                            </p>
+                          )}
+                        </div>
+                        <p className="mt-4 flex-1 text-primary">
+                          {event.description}
+                        </p>
+                        <div className="mt-6 flex flex-wrap gap-2">
+                          {event.tags.map((tag: string) => (
+                            <span
+                              key={tag}
+                              className="event-tag inline-flex items-center rounded-full bg-[#F6D2EF] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })}
+            </div>
+            <div className="mt-12 text-center">
+              <Link
+                href="/events"
+                className="inline-flex items-center justify-center rounded-full bg-[#681155] px-8 py-4 text-base font-semibold text-white shadow-lg shadow-[#681155]/30 hover:bg-[#FF5EC3] transition-colors"
+              >
+                იხილე მეტი ღონისძიება →
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
+    </>
   );
 }

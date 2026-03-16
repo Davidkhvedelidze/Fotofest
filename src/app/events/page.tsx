@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -18,39 +18,45 @@ export default function EventsPage() {
   const [events, setEvents] = useState<EventShowcase[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const data = await getShowcaseEventsApi();
-        const apiEvents = data.events || [];
-        const sortedEvents = [...apiEvents].sort(
-          (
-            a: EventShowcase & { createdAt?: string; date?: string },
-            b: EventShowcase & { createdAt?: string; date?: string }
-          ) => {
-            const aDate = a.date || a.createdAt;
-            const bDate = b.date || b.createdAt;
 
-            if (aDate && bDate) {
-              return new Date(bDate).getTime() - new Date(aDate).getTime();
-            }
-            if (aDate) return -1;
-            if (bDate) return 1;
-            return 0;
+  const fetchEvents = useCallback(async () => {
+    setIsLoading(true);
+    setFetchError(false);
+    try {
+      const data = await getShowcaseEventsApi();
+      const apiEvents = data.events || [];
+      const sortedEvents = [...apiEvents].sort(
+        (
+          a: EventShowcase & { createdAt?: string; date?: string },
+          b: EventShowcase & { createdAt?: string; date?: string }
+        ) => {
+          const aDate = a.date || a.createdAt;
+          const bDate = b.date || b.createdAt;
+
+          if (aDate && bDate) {
+            return new Date(bDate).getTime() - new Date(aDate).getTime();
           }
-        );
-        setEvents(sortedEvents);
-      } catch (err) {
-        logError({ message: "Error fetching showcase events", error: err });
-        setEvents([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchEvents();
+          if (aDate) return -1;
+          if (bDate) return 1;
+          return 0;
+        }
+      );
+      setEvents(sortedEvents);
+    } catch (err) {
+      logError({ message: "Error fetching showcase events", error: err });
+      setFetchError(true);
+      setEvents([]);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
+
 
   // Filter events based on search query
   const filteredEvents = useMemo(() => {
@@ -101,6 +107,31 @@ export default function EventsPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#F6D2EF] to-[#F9E5F5]">
         <div className="text-primary text-xl">Loading events...</div>
+      </div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-gradient-to-br from-[#F6D2EF] to-[#F9E5F5]">
+        <p className="text-[#681155] text-xl font-semibold">
+          ღონისძიებების ჩატვირთვა ვერ მოხერხდა
+        </p>
+        <p className="text-primary text-sm">
+          გთხოვ შეამოწმე შენი კავშირი და სცადე ხელახლა
+        </p>
+        <button
+          onClick={fetchEvents}
+          className="px-8 py-3 bg-[#681155] text-white rounded-full font-semibold hover:bg-[#FF5EC3] transition-colors"
+        >
+          ხელახლა სცადე
+        </button>
+        <Link
+          href="/"
+          className="text-sm text-primary underline hover:text-brand-pink transition-colors"
+        >
+          ← მთავარ გვერდზე დაბრუნება
+        </Link>
       </div>
     );
   }

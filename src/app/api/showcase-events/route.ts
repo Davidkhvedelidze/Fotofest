@@ -8,6 +8,9 @@ import { EventShowcase } from "@/features/events/types/events";
 import { verifyAdminToken } from "@/lib/auth-utils";
 import { logError } from "@/lib/services/logger";
 
+// Never cache this route – events must always be fresh from storage
+export const dynamic = "force-dynamic";
+
 export async function POST(request: NextRequest) {
   // Verify admin authentication
   const isAuthenticated = await verifyAdminToken();
@@ -62,7 +65,12 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   try {
     const events = await getShowcaseEvents();
-    return NextResponse.json({ events }, { status: 200 });
+    return NextResponse.json({ events }, {
+      status: 200,
+      headers: {
+        "Cache-Control": "no-store, no-cache, must-revalidate",
+      },
+    });
   } catch (error) {
     logError({ message: "Error fetching showcase events", error });
     return NextResponse.json(

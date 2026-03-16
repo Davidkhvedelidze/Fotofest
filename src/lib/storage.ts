@@ -16,7 +16,7 @@ function isVercel(): boolean {
 }
 
 // Check if Upstash Redis (Storage KV) is configured
-function useUpstash(): boolean {
+function isUpstashConfigured(): boolean {
   return !!(
     process.env.UPSTASH_STORAGE_KV_REST_API_URL &&
     process.env.UPSTASH_STORAGE_KV_REST_API_TOKEN
@@ -76,8 +76,11 @@ async function loadFromUpstash(): Promise<
     }
 
     const redis = new Redis({ url, token });
-    const data = await redis.get<string>(STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
+    const raw = await redis.get<string | object>(STORAGE_KEY);
+    if (!raw) return [];
+    // Upstash REST SDK may return already-parsed JSON (not a string)
+    const data = typeof raw === "string" ? JSON.parse(raw) : raw;
+    return Array.isArray(data) ? data : [];
   } catch (error) {
     logError({ message: "KV load error", error });
     return [];
@@ -123,7 +126,7 @@ export async function saveEvents(
 ) {
   // On Vercel, we MUST use remote storage (file system is read-only)
   if (isVercel()) {
-    if (!useUpstash()) {
+    if (!isUpstashConfigured()) {
       throw new Error(
         "Upstash Redis (Storage KV) is not configured. Please set up Upstash and configure UPSTASH_STORAGE_KV_REST_API_URL and UPSTASH_STORAGE_KV_REST_API_TOKEN in your Vercel project."
       );
@@ -140,7 +143,7 @@ export async function loadEvents(): Promise<
 > {
   // On Vercel, we MUST use remote storage (file system is read-only)
   if (isVercel()) {
-    if (!useUpstash()) {
+    if (!isUpstashConfigured()) {
       logError({ message: "Vercel KV not configured, returning empty array" });
       return [];
     }

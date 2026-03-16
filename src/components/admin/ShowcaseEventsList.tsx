@@ -9,6 +9,7 @@ import {
   getShowcaseEventsApi,
 } from "@/features/events/api/eventsClient";
 import { logError } from "@/lib/services/logger";
+import { log } from "console";
 
 interface ShowcaseEvent extends EventShowcase {
   id?: string;
@@ -24,12 +25,17 @@ export function ShowcaseEventsList() {
   const fetchEvents = useCallback(async () => {
     try {
       const data = await getShowcaseEventsApi();
+
+      console.log(data);
+
       const eventsList = Array.isArray(data.events) ? data.events : [];
-      const sortedEvents = eventsList.sort((a: ShowcaseEvent, b: ShowcaseEvent) => {
-        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-        return dateB - dateA;
-      });
+      const sortedEvents = eventsList.sort(
+        (a: ShowcaseEvent, b: ShowcaseEvent) => {
+          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return dateB - dateA;
+        },
+      );
       setEvents(sortedEvents);
     } catch (err) {
       setError("Error loading showcase events");
@@ -170,8 +176,14 @@ export function ShowcaseEventsList() {
                   <p className="text-sm font-semibold text-[#681155] mb-2">
                     Image:
                   </p>
-                  <div className="relative h-48 w-[20%] overflow-hidden rounded-2xl">
-                    <Image src={event.image} alt={event.name} fill />
+                  <div className="relative h-48 aspect-video w-full md:w-1/2და overflow-hidden rounded-2xl">
+                    <Image
+                      src={event.image}
+                      alt={event.name}
+                      className="object-cover transition-transform duration-1000 group-hover:scale-110"
+                      fill
+                      unoptimized
+                    />
                   </div>
                 </div>
               )}

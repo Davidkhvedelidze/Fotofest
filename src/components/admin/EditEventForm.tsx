@@ -197,11 +197,11 @@ export function EditEventForm({
         <input
           id="edit-image"
           name="image"
-          type="url"
+          type="text"
           value={formData.image}
           onChange={handleChange}
           className="w-full rounded-2xl border border-[#E2A9F1] bg-white/90 px-4 py-3 text-[#1A032D] shadow-inner focus:border-[#FF5EC3] focus:outline-none mb-2"
-          placeholder="https://example.com/image.jpg or upload below"
+          placeholder="https://example.com/image.jpg"
         />
         <div className="flex items-center gap-2">
           <input
@@ -252,14 +252,14 @@ export function EditEventForm({
         <input
           id="edit-redirectUrl"
           name="redirectUrl"
-          type="url"
+          type="text"
           value={formData.redirectUrl}
           onChange={handleChange}
           className="w-full rounded-2xl border border-[#E2A9F1] bg-white/90 px-4 py-3 text-[#1A032D] shadow-inner focus:border-[#FF5EC3] focus:outline-none"
-          placeholder="https://example.com or /page (optional - where to redirect when event is clicked)"
+          placeholder="https://example.com ან /events"
         />
         <p className="text-xs text-[#681155] opacity-70 mt-1">
-          Optional: URL to redirect users when they click on this event card
+          სურვილისამებრ: URL ან შიდა გზა (მაგ: /events)
         </p>
       </div>
 

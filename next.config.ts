@@ -16,6 +16,15 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "encrypted-tbn0.gstatic.com",
       },
+      // Vercel Blob storage – images uploaded via the admin panel
+      {
+        protocol: "https",
+        hostname: "*.vercel-storage.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.public.blob.vercel-storage.com",
+      },
     ],
   },
 };

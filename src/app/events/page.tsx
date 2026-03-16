@@ -30,7 +30,7 @@ export default function EventsPage() {
       const sortedEvents = [...apiEvents].sort(
         (
           a: EventShowcase & { createdAt?: string; date?: string },
-          b: EventShowcase & { createdAt?: string; date?: string }
+          b: EventShowcase & { createdAt?: string; date?: string },
         ) => {
           const aDate = a.date || a.createdAt;
           const bDate = b.date || b.createdAt;
@@ -41,7 +41,7 @@ export default function EventsPage() {
           if (aDate) return -1;
           if (bDate) return 1;
           return 0;
-        }
+        },
       );
       setEvents(sortedEvents);
     } catch (err) {
@@ -56,7 +56,6 @@ export default function EventsPage() {
   useEffect(() => {
     fetchEvents();
   }, [fetchEvents]);
-
 
   // Filter events based on search query
   const filteredEvents = useMemo(() => {
@@ -187,7 +186,7 @@ export default function EventsPage() {
 
       {/* Events Grid */}
       <main className="py-12">
-        <div className="mx-auto max-w-6xl px-6 lg:px-10 relative overflow-x-hidden">
+        <div className="mx-auto max-w-6xl px-6 lg:px-10 relative overflow-hidden ">
           <Image
             src={bgImage}
             alt="Events"
@@ -248,7 +247,7 @@ export default function EventsPage() {
                                   year: "numeric",
                                   month: "2-digit",
                                   day: "2-digit",
-                                }
+                                },
                               )}
                             </p>
                           )}
@@ -316,7 +315,7 @@ export default function EventsPage() {
                           );
                         }
                         return null;
-                      }
+                      },
                     )}
                   </div>
 

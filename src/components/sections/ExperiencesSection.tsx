@@ -17,7 +17,10 @@ const cardVariants = {
 
 export function ExperiencesSection() {
   return (
-    <section id="experiences" className="bg-section-alt py-24 relative">
+    <section
+      id="experiences"
+      className="bg-section-alt py-24 relative overflow-hidden"
+    >
       <Image
         src={bgImage}
         alt="Experiences"

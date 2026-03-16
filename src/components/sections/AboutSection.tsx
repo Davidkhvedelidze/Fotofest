@@ -10,7 +10,7 @@ import LiquidGlass from "../ui/LiquidGlass";
 export function AboutSection() {
   return (
     <section id="about" className="py-24">
-      <div className="mx-auto max-w-6xl px-6 lg:px-10 relative overflow-x-hidden md:overflow-x-visible">
+      <div className="mx-auto max-w-6xl px-6 lg:px-10 relative ">
         <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <Image
             src={bgImage}

@@ -24,12 +24,20 @@ export function AddEventForm({ onSuccess }: { onSuccess: () => void }) {
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [imageUrlError, setImageUrlError] = useState("");
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === "image") {
+      if (value && !/\.(jpg|png)$/i.test(value)) {
+        setImageUrlError("Image URL must end with .jpg or .png");
+      } else {
+        setImageUrlError("");
+      }
+    }
   };
 
   const handleAddTag = () => {
@@ -188,7 +196,7 @@ export function AddEventForm({ onSuccess }: { onSuccess: () => void }) {
           htmlFor="image"
           className="block text-sm font-semibold text-[#681155] mb-2"
         >
-          Image URL or upload
+          Image URL
         </label>
         <input
           id="image"
@@ -197,16 +205,19 @@ export function AddEventForm({ onSuccess }: { onSuccess: () => void }) {
           value={formData.image}
           onChange={handleChange}
           className="w-full rounded-2xl border border-[#E2A9F1] bg-white/90 px-4 py-3 text-[#1A032D] shadow-inner focus:border-[#FF5EC3] focus:outline-none mb-2"
-          placeholder="https://example.com/image.jpg or upload below"
+          placeholder="https://example.com/image.jpg"
         />
+        {imageUrlError && (
+          <p className="text-xs text-red-600 mt-1">{imageUrlError}</p>
+        )}
         <div className="flex items-center gap-2">
-          <input
+          {/* <input
             type="file"
             accept="image/jpeg,image/png,image/webp,image/gif"
             onChange={handleFileUpload}
             disabled={isUploading}
             className="text-sm text-[#681155] file:mr-3 file:rounded-xl file:border-0 file:bg-[#F6D2EF] file:px-4 file:py-2 file:font-semibold file:text-[#681155] hover:file:bg-[#E2A9F1]"
-          />
+          /> */}
           {isUploading && (
             <span className="text-sm text-[#681155] opacity-70">
               Uploading…
@@ -255,7 +266,8 @@ export function AddEventForm({ onSuccess }: { onSuccess: () => void }) {
           placeholder="https://example.com ან /events"
         />
         <p className="text-xs text-[#681155] opacity-70 mt-1">
-          სურვილისამებრ: URL ან შიდა გზა (მაგ: /events), სადაც გადავა მომხმარებელი ბარათზე დაჭერის შემდეგ
+          სურვილისამებრ: URL ან შიდა გზა (მაგ: /events), სადაც გადავა
+          მომხმარებელი ბარათზე დაჭერის შემდეგ
         </p>
       </div>
 
@@ -317,7 +329,7 @@ export function AddEventForm({ onSuccess }: { onSuccess: () => void }) {
 
       <button
         type="submit"
-        disabled={isSubmitting || formData.tags.length === 0}
+        disabled={isSubmitting || formData.tags.length === 0 || !!imageUrlError}
         className="w-full rounded-full bg-[#681155] px-8 py-4 text-base font-semibold text-white shadow-lg shadow-[#681155]/30 hover:bg-[#FF5EC3] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isSubmitting ? "Adding Event..." : "Add Event"}

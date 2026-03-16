@@ -30,7 +30,7 @@ export function EventsSection() {
       const sortedEvents = [...apiEvents].sort(
         (
           a: EventShowcase & { createdAt?: string; date?: string },
-          b: EventShowcase & { createdAt?: string; date?: string }
+          b: EventShowcase & { createdAt?: string; date?: string },
         ) => {
           if (a.createdAt && b.createdAt) {
             return (
@@ -45,7 +45,7 @@ export function EventsSection() {
           if (a.date) return -1;
           if (b.date) return 1;
           return 0;
-        }
+        },
       );
       setEvents(sortedEvents.slice(0, 6));
     } catch (err) {
@@ -75,7 +75,7 @@ export function EventsSection() {
             scrub: 0.5,
             invalidateOnRefresh: true,
           },
-        }
+        },
       );
 
       // Section heading animation
@@ -96,7 +96,7 @@ export function EventsSection() {
             toggleActions: "play none none none",
             invalidateOnRefresh: true,
           },
-        }
+        },
       );
 
       const cards = gsap.utils.toArray<HTMLElement>(".event-card");
@@ -186,7 +186,7 @@ export function EventsSection() {
         // Store listeners for cleanup
         eventListenersRef.current.push(
           { element: card, type: "mouseenter", handler: handleMouseEnter },
-          { element: card, type: "mouseleave", handler: handleMouseLeave }
+          { element: card, type: "mouseleave", handler: handleMouseLeave },
         );
       });
 
@@ -255,7 +255,7 @@ export function EventsSection() {
                         window.open(
                           event.redirectUrl,
                           "_blank",
-                          "noopener,noreferrer"
+                          "noopener,noreferrer",
                         );
                       } else if (event.redirectUrl.startsWith("/")) {
                         // Internal route - use Next.js router for client-side navigation
@@ -299,7 +299,7 @@ export function EventsSection() {
                                   year: "numeric",
                                   month: "2-digit",
                                   day: "2-digit",
-                                }
+                                },
                               )}
                             </p>
                           )}

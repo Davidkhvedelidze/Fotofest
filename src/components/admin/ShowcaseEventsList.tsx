@@ -140,18 +140,18 @@ export function ShowcaseEventsList() {
                     {event.location}
                   </p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex md:gap-2 gap-1">
                   <button
                     type="button"
                     onClick={() => handleEdit(event)}
-                    className="px-4 py-2 bg-[#681155] text-white rounded-full text-sm font-semibold hover:bg-[#FF5EC3] transition-colors"
+                    className="md:px-4 px-2 md:py-2 py-1 bg-[#681155] text-white rounded-full md:text-sm text-[12px] font-semibold hover:bg-[#FF5EC3] transition-colors"
                   >
                     Edit
                   </button>
                   <button
                     type="button"
                     onClick={() => event.id && handleDelete(event.id)}
-                    className="px-4 py-2 bg-red-500 text-white rounded-full text-sm font-semibold hover:bg-red-600 transition-colors"
+                    className="md:px-4 px-2 md:py-2 py-1 bg-red-500 text-white rounded-full  md:text-sm text-[12px] font-semibold hover:bg-red-600 transition-colors"
                   >
                     Delete
                   </button>
@@ -176,13 +176,12 @@ export function ShowcaseEventsList() {
                   <p className="text-sm font-semibold text-[#681155] mb-2">
                     Image:
                   </p>
-                  <div className="relative h-48 aspect-video w-full md:w-1/2და overflow-hidden rounded-2xl">
+                  <div className="relative min-h-48  w-auto max-w-md   overflow-hidden rounded-2xl">
                     <Image
                       src={event.image}
                       alt={event.name}
-                      className="object-cover transition-transform duration-1000 group-hover:scale-110"
+                      className="object-cover  aspect-video"
                       fill
-                      unoptimized
                     />
                   </div>
                 </div>

@@ -45,7 +45,9 @@
   height: var(--glass-size-h);
   padding: var(--glass-padding);
   position: relative;
-  transition: width var(--transition), height var(--transition),
+  transition:
+    width var(--transition),
+    height var(--transition),
     padding var(--transition);
   width: var(--glass-size-w);
 
@@ -67,7 +69,9 @@
 
 .liquid-glass--face {
   border-radius: var(--border-radius);
-  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.15), 0 0 12px rgba(0, 0, 0, 0.08);
+  box-shadow:
+    0 4px 4px rgba(0, 0, 0, 0.15),
+    0 0 12px rgba(0, 0, 0, 0.08);
   inset: 0;
   position: absolute;
   z-index: 1;
@@ -75,7 +79,8 @@
 
 .liquid-glass--edge {
   border-radius: var(--border-radius);
-  box-shadow: inset 3px 3px 3px 0 rgba(255, 255, 255, 0.45),
+  box-shadow:
+    inset 3px 3px 3px 0 rgba(255, 255, 255, 0.45),
     inset -3px -3px 3px 0 rgba(255, 255, 255, 0.45);
   inset: 0;
   position: absolute;
@@ -105,13 +110,16 @@
 
 .liquid-glass__link {
   border-radius: var(--icon-border-radius);
-  box-shadow: inset 1px 1px 1px 0 rgba(255, 255, 255, 0.45),
+  box-shadow:
+    inset 1px 1px 1px 0 rgba(255, 255, 255, 0.45),
     inset -1px -1px 1px 0 rgba(255, 255, 255, 0.45);
   display: flex;
   height: var(--icon-size);
   padding: var(--icon-padding);
   pointer-events: none;
-  transition: width var(--transition), height var(--transition),
+  transition:
+    width var(--transition),
+    height var(--transition),
     border-radius var(--transition);
   width: var(--icon-size);
   z-index: 3;
@@ -122,7 +130,8 @@
     --icon-padding: 1.5rem;
     cursor: default;
     pointer-events: auto;
-    box-shadow: inset 1px 2px 2px 0 rgba(255, 255, 255, 0.45),
+    box-shadow:
+      inset 1px 2px 2px 0 rgba(255, 255, 255, 0.45),
       inset -1px -2px 2px 0 rgba(255, 255, 255, 0.45);
   }
 }
@@ -184,7 +193,8 @@
   --radius-md: 0.75rem;
   --spacing-unit: 0.25rem;
   --gradient-background: linear-gradient(180deg, #edf1f8 0%, #f8fbff 100%);
-  --font-sans: "DM Merab Kostava", "Manrope", var(--font-geist-sans), system-ui,
+  --font-sans:
+    "DM Merab Kostava", "Manrope", var(--font-geist-sans), system-ui,
     -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   /* Brand colors */
   --color-brand-purple: #681155;
@@ -304,7 +314,8 @@ html {
 h1,
 h2,
 h3 {
-  font-family: "DM Merab Kostava", "Fira Sans", "Inter", "Helvetica Neue", Arial,
+  font-family:
+    "DM Merab Kostava", "Fira Sans", "Inter", "Helvetica Neue", Arial,
     sans-serif;
   font-weight: normal;
   font-style: normal;
@@ -381,6 +392,17 @@ button[type="button"] {
   transition: all 0.3s ease;
   box-shadow: var(--shadow-soft);
   font-family: var(--font-sans);
+}
+
+@media (max-width: 768px) {
+  button[type="submit"] {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.875rem;
+  }
+  button[type="button"] {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.875rem;
+  }
 }
 
 button[type="submit"]:hover:not(:disabled) {
@@ -580,7 +602,9 @@ button[type="submit"]:focus {
 }
 
 .event-tag {
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
   will-change: transform, opacity;
 }
 

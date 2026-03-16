@@ -1,5 +1,8 @@
 import type { ExperienceFeature } from "@/features/experiences/types/experience";
-import type { EventShowcase, RequestEventFormData } from "@/features/events/types/events";
+import type {
+  EventShowcase,
+  RequestEventFormData,
+} from "@/features/events/types/events";
 import type { NavLink } from "@/features/navigation/types/navigation";
 import type { ContactChannel } from "@/features/contact/types/contact";
 import photoBooth from "../../../public/products/სარკე.png";
@@ -16,12 +19,11 @@ export const navLinks: NavLink[] = [
 export const experienceFeatures: ExperienceFeature[] = [
   {
     title: "ჯადოსნური სარკე",
-    description:
-      "ფოტოების, გიფებისა და ბუმერანგების გადაღება ზუსტად იმ დროს, როცა ემოცია ყველაზე ძლიერია, სუპერ სწრაფი გაზიარებით.",
+    description: "გადაიღე ფოტოები, გიფები და ბუმერანგები",
     bullets: [
-      "ინდივიდუალური დიზაინი თითოეული ღონისძიებისთვის",
-      "ადგილზე ბეჭდვა და ციფრული ვერსიის QR კოდი წამებში",
-      "იდეალური არჩევანი სელფის მოყვარულთათვის",
+      "ადგილზე ბეჭდვა წამებში, ულიმიტოდ",
+      "QR კოდით გაზიარება",
+      "თითოეული ღონისძიებისთვის ინდივიდუალურად დამზადებული დიზაინი",
     ],
     accentColor: "#E2A9F1",
     image: photoBooth,
@@ -29,12 +31,11 @@ export const experienceFeatures: ExperienceFeature[] = [
   },
   {
     title: "ფოტოკაბინა",
-    description:
-      "ულიმიტო ბეჭდვა, ელეგანტური დიზაინი და ინტერაქტიული რეკვიზიტები დაუვიწყარი ცერემონიებისთვის.",
+    description: "გადაიღე ფოტოები, გიფები და ბუმერანგები",
     bullets: [
-      "ფოტოების, გიფების და ბუმერანგების გადაღება",
-      "ფოტოებს ბეჭდავ მომენტალურად და ულიმიტოდ",
-      "ციფრული ვერსიის QR კოდი — გაზიარება ერთ შეხებაში",
+      "ადგილზე ბეჭდვა წამებში, ულიმიტოდ",
+      "QR კოდით გაზიარება",
+      "თითოეული ღონისძიებისთვის ინდივიდუალურად დამზადებული დიზაინი",
     ],
     accentColor: "#CB6CE6",
     image:
@@ -43,12 +44,11 @@ export const experienceFeatures: ExperienceFeature[] = [
   },
   {
     title: "კადრი 360°",
-    description:
-      "360 გრადუსიანი slow motion ვიდეოები და 3D ეფექტები, რომლებიც თქვენს ღონისძიებას განსხვავებულ ბრწყინვალებას სძენს.",
+    description: "გადაიღე უმაღლესი ხარისხის Slow Motion ვიდეო, 360 გრადუსით.",
     bullets: [
       "ინდივიდუალური ბრენდირება კადრებზე",
-      "მომენტალური წვდომა გადაიღებულ ვიდეოზე",
-      "სტაბილური პლატფორმა ნებისმიერი სივრცისთვის",
+      "მომენტალური წვდომა გადაღებულ ვიდეოზე",
+      "3D პლატფორმა",
     ],
     accentColor: "#FF5EC3",
     image: photoBooth,

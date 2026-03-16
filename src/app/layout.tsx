@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
 import { AntdProvider } from "@/components/providers/AntdProvider";
+import { TestModeBanner } from "@/components/ui/TestModeBanner";
 
 export const metadata: Metadata = {
   title: "PhotoFest • Event Photo Experiences",
@@ -40,6 +41,7 @@ export default function RootLayout({
             `,
           }}
         />
+        <TestModeBanner />
         <AntdProvider>{children}</AntdProvider>
         <footer className="border-t border-white/30 font-sans bg-[#681155]   py-10 text-center text-sm text-white">
           <p>

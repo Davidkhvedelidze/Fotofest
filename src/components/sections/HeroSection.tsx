@@ -91,7 +91,7 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
       </div>
       <div className="mx-auto flex max-w-6xl  flex-col-reverse gap-8 px-6 py-12 md:flex-row md:gap-12 md:py-24 lg:px-10 lg:py-32">
         <motion.div
-          className="space-y-6 md:flex-1"
+          className="space-y-6 md:flex-1 flex flex-col justify-center gap-5"
           initial="hidden"
           animate="visible"
           transition={{ duration: 0.8, ease: "easeOut" }}
@@ -104,12 +104,12 @@ export function HeroSection({ onCtaClick }: HeroSectionProps) {
             ჯადოსნური სარკე, ფოტოკაბინა და 360° გამოცდილება თქვენი
             ღონისძიებისთვის
           </h1>
-          <p className="max-w-xl text-base text-[#681155] md:text-lg dark:text-white">
+          {/* <p className="max-w-xl text-base text-[#681155] md:text-lg dark:text-white">
             PhotoFest ქმნის დაუვიწყარ მომენტებს ციფრული მაგიით. ჩვენი მოდულური
             ფოტო ზონა მოიცავს ჯადოსნურ სარკეს, ფოტოკაბინას და 360° პლატფორმას —
             ყოველ ივენთზე ვქმნით უნიკალურ დიზაინს, მყისიერ ბეჭდვას და
             გაზიარებას.
-          </p>
+          </p> */}
           <div className="flex flex-wrap gap-4">
             <motion.a
               href="#request"

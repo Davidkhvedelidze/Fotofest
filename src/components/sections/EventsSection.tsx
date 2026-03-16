@@ -224,7 +224,7 @@ export function EventsSection() {
         <section
           ref={sectionRef}
           id="events"
-          className="py-24 relative overflow-x-hidden md:overflow-x-visible"
+          className="py-24 relative overflow-x-hidden xl:overflow-x-visible"
         >
           <Image
             src={bgImage}

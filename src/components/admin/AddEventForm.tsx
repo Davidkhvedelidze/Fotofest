@@ -32,8 +32,8 @@ export function AddEventForm({ onSuccess }: { onSuccess: () => void }) {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (name === "image") {
-      if (value && !/\.(jpg|png)$/i.test(value)) {
-        setImageUrlError("Image URL must end with .jpg or .png");
+      if (value && !/\.(jpg|png|jpeg)$/i.test(value)) {
+        setImageUrlError("Image URL must end with .jpg, .png or .jpeg");
       } else {
         setImageUrlError("");
       }

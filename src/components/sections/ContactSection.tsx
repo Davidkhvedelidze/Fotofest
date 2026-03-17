@@ -7,7 +7,7 @@ import { ContactChannel } from "@/features/contact/types/contact";
 
 export function ContactSection() {
   return (
-    <section id="contact" className="bg-section-alt py-24">
+    <section id="contact" className="bg-section-alt py-24 ">
       <div className="mx-auto max-w-4xl px-6 text-center lg:px-10">
         <SectionHeading eyebrow="კონტაქტი">
           გვიპოვეთ სოციალურ ქსელებსა და ელფოსტაზე

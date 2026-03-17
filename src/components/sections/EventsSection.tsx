@@ -224,12 +224,12 @@ export function EventsSection() {
         <section
           ref={sectionRef}
           id="events"
-          className="py-24 relative overflow-x-hidden xl:overflow-x-visible"
+          className="py-24 relative overflow-clip "
         >
           <Image
             src={bgImage}
             alt="Events"
-            className="absolute top-0 left-0  -z-10  w-full scale-105 "
+            className="absolute top-0 left-0 object-cover h-full  -z-10  w-full scale-105 "
           />
           <div className="mx-auto max-w-6xl px-6 lg:px-10 ">
             <div className="events-heading">
